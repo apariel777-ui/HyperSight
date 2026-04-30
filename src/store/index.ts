@@ -1,5 +1,17 @@
 import { create } from 'zustand';
 
+export interface WhaleTrade {
+  id: string;
+  coin: string;
+  side: 'B' | 'S';
+  px: string;
+  sz: string;
+  time: number;
+  hash: string;
+  usdValue: number;
+  isSmartMoney?: boolean;
+}
+
 interface StoreState {
   selectedMarket: string;
   setSelectedMarket: (market: string) => void;
@@ -13,6 +25,10 @@ interface StoreState {
   setOpenPositions: (positions: Array<any>) => void;
   tradeHistory: Array<any>;
   addTradeHistory: (trade: any) => void;
+  whaleTrades: WhaleTrade[];
+  addWhaleTrade: (trade: WhaleTrade) => void;
+  tgUsername: string;
+  setTgUsername: (username: string) => void;
 }
 
 export const useStore = create<StoreState>((set) => ({
@@ -24,13 +40,14 @@ export const useStore = create<StoreState>((set) => ({
   setActiveDrawingTool: (tool) => set({ activeDrawingTool: tool }),
   drawingBuffer: null,
   setDrawingBuffer: (point) => set({ drawingBuffer: point }),
-  openPositions: [
-    { id: '1', asset: 'BTC', side: 'Long', entryPrice: 65000, currentPrice: 66200, size: 0.5, pnl: 600, liqudationPrice: 61000 },
-    { id: '2', asset: 'ETH', side: 'Short', entryPrice: 3500, currentPrice: 3450, size: 10, pnl: 500, liqudationPrice: 3800 }
-  ],
+  openPositions: [],
   setOpenPositions: (positions) => set({ openPositions: positions }),
-  tradeHistory: [
-    { id: '1', asset: 'SOL', side: 'Long', price: 140, size: 50, timestamp: Date.now() - 86400000, pnl: 250, builder: 'HyperSight' }
-  ],
+  tradeHistory: [],
   addTradeHistory: (trade) => set((state) => ({ tradeHistory: [trade, ...state.tradeHistory] })),
+  whaleTrades: [],
+  addWhaleTrade: (trade) => set((state) => ({ 
+    whaleTrades: [trade, ...state.whaleTrades].slice(0, 100) 
+  })),
+  tgUsername: '',
+  setTgUsername: (username) => set({ tgUsername: username }),
 }));

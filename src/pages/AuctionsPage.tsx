@@ -100,7 +100,8 @@ const PriceDecayCurve: React.FC<{ auction: RealAuction }> = ({ auction }) => {
 };
 
 const TelegramAlertPanel = () => {
-  const [tgUsername, setTgUsername] = useState('');
+  const tgUsername = useStore((s) => s.tgUsername);
+  const setGlobalTgUsername = useStore((s) => s.setTgUsername);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -117,7 +118,6 @@ const TelegramAlertPanel = () => {
       
       if (res.ok) {
         setStatus('success');
-        setTgUsername('');
         setTimeout(() => setStatus('idle'), 3000);
       } else {
         setStatus('error');
@@ -152,7 +152,7 @@ const TelegramAlertPanel = () => {
                  type="text"
                  placeholder="username"
                  value={tgUsername}
-                 onChange={(e) => setTgUsername(e.target.value.replace('@', ''))}
+                 onChange={(e) => setGlobalTgUsername(e.target.value.replace('@', ''))}
                  className="w-full bg-dark-900 border border-dark-800 rounded px-10 py-3 text-white font-mono text-sm focus:border-brand-neon focus:outline-none transition-colors"
                  required
                />
