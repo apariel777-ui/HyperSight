@@ -5,7 +5,10 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const dbPath = join(__dirname, 'database.sqlite');
+// Use /app/data for persistence in Docker if available, otherwise fallback to local dir
+const dbPath = process.env.NODE_ENV === 'production' && !process.env.DB_PATH_OVERRIDE 
+  ? join('/app/data', 'database.sqlite')
+  : join(__dirname, 'database.sqlite');
 
 // Initialize DB
 const db = new sqlite3.Database(dbPath, (err) => {
@@ -133,6 +136,6 @@ app.get('*', (req, res) => {
   res.sendFile(join(distPath, 'index.html'));
 });
 
-app.listen(process.env.PORT || 3001, () => {
-  console.log(`HyperSight Production Server running on port ${process.env.PORT || 3001}`);
+app.listen(process.env.PORT || 7860, () => {
+  console.log(`HyperSight Production Server running on port ${process.env.PORT || 7860}`);
 });
