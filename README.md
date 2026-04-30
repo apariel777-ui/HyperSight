@@ -1,73 +1,29 @@
-# React + TypeScript + Vite
+---
+title: HyperSight
+emoji: 📊
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+pinned: false
+---
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# HyperSight Auction Aggregator
 
-Currently, two official plugins are available:
+HyperSight is a professional-grade, multi-asset trading terminal and auction aggregator for Hyperliquid.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
+- **Real-time Auction Dashboard:** Track live auctions with decaying price progress bars.
+- **Persistent History:** Automatically archives settled auctions into a local SQLite database.
+- **Telegram Alerts:** Register your @username on the site and link with the bot for instant 🚨 notifications.
+- **High-Volume Live Feed:** Monitors high-activity perpetual markets (BTC, ETH, SOL, HYPE, etc.) to ensure a constant flow of market data.
 
-## React Compiler
+## Tech Stack
+- **Frontend:** React (Vite), Tailwind CSS, Framer Motion, Lightweight Charts.
+- **Backend:** Node.js (Express), SQLite3.
+- **Infrastructure:** Docker-ready for 24/7 hosting on Hugging Face Spaces.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Deployment
+This project is designed to run on Hugging Face Spaces using Docker.
+1. Connect your GitHub repo to a Hugging Face Space.
+2. Select the **Docker** SDK.
+3. Add your `TELEGRAM_BOT_TOKEN` to the Space Secrets.
