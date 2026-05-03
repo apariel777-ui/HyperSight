@@ -188,7 +188,8 @@ export const fetchLeaderboard = async (): Promise<any> => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type: 'leaderboard' }),
   });
-  return response.json();
+  const data = await response.json();
+  return data;
 };
 
 export const fetchWhaleState = async (user: string): Promise<any> => {

@@ -13,7 +13,13 @@ export const LeaderboardPanel: React.FC = () => {
     const load = async () => {
       try {
         const data = await fetchLeaderboard();
-        const rawEntries = data?.leaderboardEntries || data?.leaderboard || [];
+        let rawEntries = [];
+        
+        if (Array.isArray(data)) {
+          rawEntries = data;
+        } else {
+          rawEntries = data?.leaderboardEntries || data?.leaderboard || [];
+        }
         
         if (Array.isArray(rawEntries)) {
           const mapped = rawEntries.slice(0, 10).map((entry: any, index: number) => ({
