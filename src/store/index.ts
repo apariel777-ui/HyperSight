@@ -23,6 +23,14 @@ export interface Liquidation {
   user: string;
 }
 
+export interface LimitOrder {
+  coin: string;
+  side: 'Buy' | 'Sell';
+  px: string;
+  sz: string;
+  usdValue: number;
+  timestamp: number;
+}
 export interface LeaderboardEntry {
   ethAddress: string;
   accountValue: string;
@@ -67,8 +75,9 @@ interface StoreState {
   setTgUsername: (username: string) => void;
   leaderboard: LeaderboardEntry[];
   setLeaderboard: (data: LeaderboardEntry[]) => void;
-  selectedWhale: WhalePortfolio | null;
-  setSelectedWhale: (data: WhalePortfolio | null) => void;
+  limitOrders: LimitOrder[];
+  setLimitOrders: (orders: LimitOrder[]) => void;
+  addLimitOrder: (order: LimitOrder) => void;
 }
 
 export const useStore = create<StoreState>((set) => ({
@@ -98,4 +107,13 @@ export const useStore = create<StoreState>((set) => ({
   setLeaderboard: (data) => set({ leaderboard: data }),
   selectedWhale: null,
   setSelectedWhale: (data) => set({ selectedWhale: data }),
+  limitOrders: [],
+  setLimitOrders: (orders) => set({ limitOrders: orders }),
+  addLimitOrder: (order) => set((state) => {
+    // Keep only unique orders per coin/px/side
+    const filtered = state.limitOrders.filter(o => 
+      !(o.coin === order.coin && o.px === order.px && o.side === order.side)
+    );
+    return { limitOrders: [order, ...filtered].slice(0, 500) };
+  }),
 }));

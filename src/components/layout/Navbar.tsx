@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Activity, BarChart2, Zap, Gavel, Eye } from 'lucide-react';
+import { Activity, BarChart2, Zap, Gavel, Eye, Layers } from 'lucide-react';
 import clsx from 'clsx';
 
 export const Navbar = () => {
@@ -7,6 +7,7 @@ export const Navbar = () => {
     { name: 'Markets', path: '/', icon: Activity },
     { name: 'Trade', path: '/chart', icon: BarChart2 },
     { name: 'Track', path: '/track', icon: Eye },
+    { name: 'Walls', path: '/walls', icon: Layers },
     { name: 'Auctions', path: '/auctions', icon: Gavel },
   ];
 
