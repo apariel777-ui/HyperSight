@@ -24,11 +24,20 @@ const SMART_MONEY_WALLETS = [
   '0x8623b976269661a29f8c5b169f9e71b26938a9a6',
 ];
 
+interface LiquidationEvent {
+  id: string;
+  coin: string;
+  side: 'Long' | 'Short';
+  px: string;
+  usdValue: number;
+  user: string;
+}
+
 export const TrackPage: React.FC = () => {
   const whaleTrades = useStore((s) => s.whaleTrades);
   const addWhaleTrade = useStore((s) => s.addWhaleTrade);
   const liquidations = useStore((s) => s.liquidations);
-  const addLiquidation = useStore((s) => s.addLiquidation);
+  const setLiquidations = useStore((s) => s.setLiquidations);
   const tgUsername = useStore((s) => s.tgUsername);
   const setSelectedWhale = useStore((s) => s.setSelectedWhale);
   const [isConnected, setIsConnected] = useState(false);
@@ -99,18 +108,16 @@ export const TrackPage: React.FC = () => {
         }
 
         if (msg.channel === 'liquidations' && msg.data) {
-          // Hyperliquid liquidations channel sends single events or arrays
-          const liqs = Array.isArray(msg.data) ? msg.data : [msg.data];
-          liqs.forEach((liq: any) => {
-             addLiquidation({
-               id: `${liq.coin}-${Date.now()}-${Math.random()}`,
-               coin: liq.coin,
-               side: liq.side === 'B' ? 'Short' : 'Long',
-               px: liq.px,
-               sz: liq.sz,
-               time: Date.now(),
-               usdValue: parseFloat(liq.px) * parseFloat(liq.sz)
-             });
+          const liq = msg.data;
+          addLiquidation({
+            id: Math.random().toString(36).substr(2, 9),
+            coin: liq.coin,
+            side: liq.side === 'B' ? 'Short' : 'Long', 
+            px: liq.px,
+            sz: liq.sz,
+            time: Date.now(),
+            usdValue: Math.round(parseFloat(liq.px) * parseFloat(liq.sz)),
+            user: liq.liquidated_user
           });
         }
       };
@@ -145,9 +152,13 @@ export const TrackPage: React.FC = () => {
             Buy/Sell Ratio
           </div>
           <div className="flex items-center gap-3">
-            <div className="text-2xl font-black text-brand-neon tracking-tighter">{buyCount}</div>
+            <div className="text-2xl font-black text-brand-neon tracking-tighter">
+              {buyCount + sellCount > 0 ? Math.round((buyCount / (buyCount + sellCount)) * 100) : 0}%
+            </div>
             <div className="h-6 w-[1px] bg-dark-800" />
-            <div className="text-2xl font-black text-red-500 tracking-tighter">{sellCount}</div>
+            <div className="text-2xl font-black text-red-500 tracking-tighter">
+              {buyCount + sellCount > 0 ? Math.round((sellCount / (buyCount + sellCount)) * 100) : 0}%
+            </div>
           </div>
         </div>
 
@@ -188,13 +199,12 @@ export const TrackPage: React.FC = () => {
           </div>
           <div className="flex-1 overflow-auto custom-scrollbar">
             <table className="w-full text-left border-collapse">
-              <thead className="sticky top-0 bg-dark-1000/95 backdrop-blur-md z-10">
-                <tr className="border-b border-dark-900">
-                  <th className="p-4 text-[9px] font-black uppercase tracking-widest text-dark-500">Player</th>
-                  <th className="p-4 text-[9px] font-black uppercase tracking-widest text-dark-500">Market</th>
-                  <th className="p-4 text-[9px] font-black uppercase tracking-widest text-dark-500 text-center">Side</th>
-                  <th className="p-4 text-[9px] font-black uppercase tracking-widest text-dark-500 text-right">Value</th>
-                  <th className="p-4 text-[9px] font-black uppercase tracking-widest text-dark-500 text-right">Action</th>
+              <thead className="bg-dark-900/50 border-b border-dark-800">
+                <tr>
+                  <th className="p-4 text-[9px] font-black uppercase text-dark-500">Source</th>
+                  <th className="p-4 text-[9px] font-black uppercase text-dark-500">Asset</th>
+                  <th className="p-4 text-[9px] font-black uppercase text-dark-500 text-center">Side</th>
+                  <th className="p-4 text-[9px] font-black uppercase text-dark-500 text-right">Value</th>
                 </tr>
               </thead>
               <tbody>
@@ -209,17 +219,19 @@ export const TrackPage: React.FC = () => {
                       <td className="p-4">
                         <div className="flex items-center gap-2">
                           <div className={clsx(
-                            "w-6 h-6 rounded flex items-center justify-center border",
-                            trade.isSmartMoney ? "bg-purple-500/10 border-purple-500/20 text-purple-400" : "bg-dark-800 border-dark-700 text-dark-400"
+                            "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-tighter",
+                            trade.isSmartMoney ? "bg-purple-500/10 text-purple-400" : "bg-dark-800 text-dark-500"
                           )}>
-                            {trade.isSmartMoney ? <ShieldCheck className="w-3 h-3" /> : <MousePointer2 className="w-3 h-3 opacity-50" />}
+                            {trade.isSmartMoney ? "Smart Whale" : "Market Whale"}
                           </div>
-                                                    <button 
-                            onClick={() => setSelectedWhale({ address: trade.hash, totalValue: '0', withdrawable: '0', positions: [] })}
-                            className="text-[10px] font-mono text-white hover:text-brand-neon hover:underline transition-all"
+                          <a 
+                            href={`https://hypurrscan.io/tx/${trade.hash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[9px] font-mono text-dark-500 hover:text-white transition-all underline decoration-dark-800"
                           >
-                            {trade.hash.slice(0, 6)}
-                          </button>
+                            TX:{trade.hash.slice(0, 4)}
+                          </a>
                         </div>
                       </td>
                       <td className="p-4">
@@ -289,8 +301,15 @@ export const TrackPage: React.FC = () => {
                               {liq.side === 'Long' ? '💀 Long Rekt' : '🔥 Short Squeeze'}
                             </span>
                           </div>
-                          <div className="text-[10px] text-dark-500 font-mono">
-                            At ${parseFloat(liq.px).toLocaleString()}
+                          <div className="text-[10px] text-dark-500 font-mono flex items-center gap-2">
+                            <span>At ${parseFloat(liq.px).toLocaleString()}</span>
+                            <span className="text-dark-800">|</span>
+                            <button 
+                              onClick={() => setSelectedWhale({ address: liq.user, totalValue: '0', withdrawable: '0', positions: [] })}
+                              className="hover:text-brand-neon transition-all"
+                            >
+                              Player:{liq.user.slice(0, 6)}
+                            </button>
                           </div>
                         </div>
                         <div className="text-right">

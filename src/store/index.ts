@@ -20,6 +20,7 @@ export interface Liquidation {
   sz: string;
   time: number;
   usdValue: number;
+  user: string;
 }
 
 export interface LeaderboardEntry {
