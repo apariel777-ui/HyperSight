@@ -68,13 +68,14 @@ export const TrackPage: React.FC = () => {
           }));
           ws.current?.send(JSON.stringify({
             method: "subscribe",
-            subscription: { type: "l3Events", coin }
+            subscription: { type: "liquidations", coin }
           }));
         });
       };
 
       ws.current.onmessage = (event) => {
         const msg = JSON.parse(event.data);
+        
         if (msg.channel === 'trades' && msg.data) {
           msg.data.forEach((trade: any) => {
             const usdValue = parseFloat(trade.px) * parseFloat(trade.sz);
@@ -94,11 +95,12 @@ export const TrackPage: React.FC = () => {
           });
         }
 
-        if (msg.channel === 'l3Events' && msg.data) {
-           if (msg.data.isLiquidation) {
-             const liq = msg.data;
+        if (msg.channel === 'liquidations' && msg.data) {
+          // Hyperliquid liquidations channel sends single events or arrays
+          const liqs = Array.isArray(msg.data) ? msg.data : [msg.data];
+          liqs.forEach((liq: any) => {
              addLiquidation({
-               id: `${liq.coin}-${Date.now()}`,
+               id: `${liq.coin}-${Date.now()}-${Math.random()}`,
                coin: liq.coin,
                side: liq.side === 'B' ? 'Short' : 'Long',
                px: liq.px,
@@ -106,7 +108,7 @@ export const TrackPage: React.FC = () => {
                time: Date.now(),
                usdValue: parseFloat(liq.px) * parseFloat(liq.sz)
              });
-           }
+          });
         }
       };
 

@@ -230,7 +230,7 @@ monitorWs.on('open', () => {
     console.log('Backend Radar Live (Whales & Liquidations)');
     RADAR_COINS.forEach(coin => {
         monitorWs.send(JSON.stringify({ method: "subscribe", subscription: { type: "trades", coin } }));
-        monitorWs.send(JSON.stringify({ method: "subscribe", subscription: { type: "l3Events", coin } }));
+        monitorWs.send(JSON.stringify({ method: "subscribe", subscription: { type: "liquidations", coin } }));
     });
 });
 
@@ -269,33 +269,35 @@ monitorWs.on('message', (data) => {
     }
 
     // --- LIQUIDATION CASCADES ---
-    if (msg.channel === 'l3Events' && msg.data && msg.data.isLiquidation) {
-        const liq = msg.data;
-        const val = parseFloat(liq.px) * parseFloat(liq.sz);
-        
-        // Cascade detection logic
-        const now = Date.now();
-        if (!cascadeState[liq.coin]) cascadeState[liq.coin] = { count: 0, lastTime: 0 };
-        
-        if (now - cascadeState[liq.coin].lastTime < 10000) {
-            cascadeState[liq.coin].count++;
-        } else {
-            cascadeState[liq.coin].count = 1;
-        }
-        cascadeState[liq.coin].lastTime = now;
-
-        // If 5 liquidations in 10s, alert everyone!
-        if (cascadeState[liq.coin].count === 5) {
-            const message = `🚨 **LIQUIDATION CASCADE DETECTED** 🚨\n\n` +
-                          `💎 Asset: **${liq.coin}**\n` +
-                          `💀 Event: Chain reaction of forced exits!\n` +
-                          `📉 Current Price: **$${parseFloat(liq.px).toLocaleString()}**\n\n` +
-                          `High volatility expected. Watch the heatmap.`;
+    if (msg.channel === 'liquidations' && msg.data) {
+        const liqs = Array.isArray(msg.data) ? msg.data : [msg.data];
+        liqs.forEach(liq => {
+            const val = parseFloat(liq.px) * parseFloat(liq.sz);
             
-            db.all(`SELECT chatId FROM telegram_alerts WHERE chatId IS NOT NULL`, (err, rows) => {
-                if (!err) rows.forEach(row => bot.sendMessage(row.chatId, message, { parse_mode: 'Markdown' }));
-            });
-        }
+            // Cascade detection logic
+            const now = Date.now();
+            if (!cascadeState[liq.coin]) cascadeState[liq.coin] = { count: 0, lastTime: 0 };
+            
+            if (now - cascadeState[liq.coin].lastTime < 10000) {
+                cascadeState[liq.coin].count++;
+            } else {
+                cascadeState[liq.coin].count = 1;
+            }
+            cascadeState[liq.coin].lastTime = now;
+
+            // If 5 liquidations in 10s, alert everyone!
+            if (cascadeState[liq.coin].count === 5) {
+                const message = `🚨 **LIQUIDATION CASCADE DETECTED** 🚨\n\n` +
+                              `💎 Asset: **${liq.coin}**\n` +
+                              `💀 Event: Chain reaction of forced exits!\n` +
+                              `📉 Current Price: **$${parseFloat(liq.px).toLocaleString()}**\n\n` +
+                              `High volatility expected. Watch the heatmap.`;
+                
+                db.all(`SELECT chatId FROM telegram_alerts WHERE chatId IS NOT NULL`, (err, rows) => {
+                    if (!err) rows.forEach(row => bot.sendMessage(row.chatId, message, { parse_mode: 'Markdown' }));
+                });
+            }
+        });
     }
 });
 
