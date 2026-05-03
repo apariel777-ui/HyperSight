@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useStore } from '../../store';
 import { fetchLeaderboard } from '../../api/hyperliquid';
-import { Trophy, TrendingUp, User, ExternalLink, ShieldCheck } from 'lucide-react';
+import { Trophy, ExternalLink, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 

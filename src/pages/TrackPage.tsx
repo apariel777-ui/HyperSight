@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Bell, 
-  TrendingUp, 
+  Bell,
+  TrendingUp,
   ShieldCheck,
   MousePointer2,
   Waves,
   Skull,
-  Flame,
-  Trophy
+  Flame
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
