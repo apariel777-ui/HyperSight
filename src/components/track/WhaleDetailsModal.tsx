@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useStore } from '../../store';
 import { fetchWhaleState } from '../../api/hyperliquid';
 import { X, Briefcase, TrendingUp, TrendingDown, DollarSign, ExternalLink, Activity } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import clsx from 'clsx';
 
 export const WhaleDetailsModal: React.FC = () => {

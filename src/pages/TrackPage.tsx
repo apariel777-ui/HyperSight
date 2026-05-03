@@ -7,8 +7,7 @@ import {
   MousePointer2,
   Waves,
   Skull,
-  Flame,
-  Activity
+  Flame
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
@@ -32,7 +31,6 @@ export const TrackPage: React.FC = () => {
   const addLiquidation = useStore((s) => s.addLiquidation);
   const tgUsername = useStore((s) => s.tgUsername);
   const setSelectedWhale = useStore((s) => s.setSelectedWhale);
-  const selectedWhale = useStore((s) => s.selectedWhale);
   const [isConnected, setIsConnected] = useState(false);
   const ws = useRef<WebSocket | null>(null);
 
