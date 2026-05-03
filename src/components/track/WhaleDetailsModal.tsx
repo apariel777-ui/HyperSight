@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useStore } from '../../store';
+import { useStore, WhalePosition } from '../../store';
 import { fetchWhaleState } from '../../api/hyperliquid';
 import { X, Briefcase, TrendingUp, TrendingDown, DollarSign, ExternalLink, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -117,7 +117,7 @@ export const WhaleDetailsModal: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-dark-800">
-                      {selectedWhale.positions.map((pos, idx) => (
+                      {selectedWhale.positions.map((pos: WhalePosition, idx: number) => (
                         <tr key={idx} className="hover:bg-dark-900/30 transition-all">
                           <td className="p-3">
                             <span className="text-[11px] font-black text-white">{pos.coin}</span>

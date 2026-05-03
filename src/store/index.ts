@@ -78,6 +78,8 @@ interface StoreState {
   limitOrders: LimitOrder[];
   setLimitOrders: (orders: LimitOrder[]) => void;
   addLimitOrder: (order: LimitOrder) => void;
+  selectedWhale: WhalePortfolio | null;
+  setSelectedWhale: (data: WhalePortfolio | null) => void;
 }
 
 export const useStore = create<StoreState>((set) => ({
@@ -106,10 +108,10 @@ export const useStore = create<StoreState>((set) => ({
   leaderboard: [],
   setLeaderboard: (data) => set({ leaderboard: data }),
   selectedWhale: null,
-  setSelectedWhale: (data) => set({ selectedWhale: data }),
+  setSelectedWhale: (data: WhalePortfolio | null) => set({ selectedWhale: data }),
   limitOrders: [],
   setLimitOrders: (orders) => set({ limitOrders: orders }),
-  addLimitOrder: (order) => set((state) => {
+  addLimitOrder: (order: LimitOrder) => set((state) => {
     // Keep only unique orders per coin/px/side
     const filtered = state.limitOrders.filter(o => 
       !(o.coin === order.coin && o.px === order.px && o.side === order.side)
