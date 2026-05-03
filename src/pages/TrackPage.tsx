@@ -57,7 +57,6 @@ export const TrackPage: React.FC = () => {
 
   const totalVolume = whaleTrades.reduce((acc, t) => acc + t.usdValue, 0);
   const buyVolume = whaleTrades.filter(t => t.side?.toUpperCase().startsWith('B')).reduce((acc, t) => acc + t.usdValue, 0);
-  const sellVolume = whaleTrades.filter(t => t.side?.toUpperCase().startsWith('S')).reduce((acc, t) => acc + t.usdValue, 0);
 
   const buyPercent = totalVolume > 0 ? Math.round((buyVolume / totalVolume) * 100) : 0;
   const sellPercent = totalVolume > 0 ? 100 - buyPercent : 0;
