@@ -202,8 +202,8 @@ app.post('/api/alerts/telegram', (req, res) => {
 const distPath = join(__dirname, '../dist');
 app.use(express.static(distPath));
 
-// Catch-all route for React Router
-app.get('(.*)', (req, res) => {
+// Catch-all: serve index.html for any request not handled by static files or API
+app.use((req, res) => {
   res.sendFile(join(distPath, 'index.html'));
 });
 
