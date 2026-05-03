@@ -190,3 +190,12 @@ export const fetchLeaderboard = async (): Promise<any> => {
   });
   return response.json();
 };
+
+export const fetchWhaleState = async (user: string): Promise<any> => {
+  const response = await fetch(HYPERLIQUID_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'clearinghouseState', user }),
+  });
+  return response.json();
+};

@@ -30,6 +30,21 @@ export interface LeaderboardEntry {
   rank: number;
 }
 
+export interface WhalePosition {
+  coin: string;
+  size: string;
+  entryPrice: string;
+  unrealizedPnl: string;
+  side: 'Long' | 'Short';
+}
+
+export interface WhalePortfolio {
+  address: string;
+  totalValue: string;
+  withdrawable: string;
+  positions: WhalePosition[];
+}
+
 interface StoreState {
   selectedMarket: string;
   setSelectedMarket: (market: string) => void;
@@ -51,6 +66,8 @@ interface StoreState {
   setTgUsername: (username: string) => void;
   leaderboard: LeaderboardEntry[];
   setLeaderboard: (data: LeaderboardEntry[]) => void;
+  selectedWhale: WhalePortfolio | null;
+  setSelectedWhale: (data: WhalePortfolio | null) => void;
 }
 
 export const useStore = create<StoreState>((set) => ({
@@ -78,4 +95,6 @@ export const useStore = create<StoreState>((set) => ({
   setTgUsername: (username) => set({ tgUsername: username }),
   leaderboard: [],
   setLeaderboard: (data) => set({ leaderboard: data }),
+  selectedWhale: null,
+  setSelectedWhale: (data) => set({ selectedWhale: data }),
 }));

@@ -7,11 +7,13 @@ import {
   MousePointer2,
   Waves,
   Skull,
-  Flame
+  Flame,
+  Activity
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
 import { LeaderboardPanel } from '../components/track/LeaderboardPanel';
+import { WhaleDetailsModal } from '../components/track/WhaleDetailsModal';
 
 const WHALE_THRESHOLD = 60000;
 const HL_WS_URL = 'wss://api.hyperliquid.xyz/ws';
@@ -29,6 +31,8 @@ export const TrackPage: React.FC = () => {
   const liquidations = useStore((s) => s.liquidations);
   const addLiquidation = useStore((s) => s.addLiquidation);
   const tgUsername = useStore((s) => s.tgUsername);
+  const setSelectedWhale = useStore((s) => s.setSelectedWhale);
+  const selectedWhale = useStore((s) => s.selectedWhale);
   const [isConnected, setIsConnected] = useState(false);
   const ws = useRef<WebSocket | null>(null);
 
@@ -212,7 +216,12 @@ export const TrackPage: React.FC = () => {
                           )}>
                             {trade.isSmartMoney ? <ShieldCheck className="w-3 h-3" /> : <MousePointer2 className="w-3 h-3 opacity-50" />}
                           </div>
-                          <span className="text-[10px] font-mono text-white">{trade.hash.slice(0, 6)}</span>
+                                                    <button 
+                            onClick={() => setSelectedWhale({ address: trade.hash, totalValue: '0', withdrawable: '0', positions: [] })}
+                            className="text-[10px] font-mono text-white hover:text-brand-neon hover:underline transition-all"
+                          >
+                            {trade.hash.slice(0, 6)}
+                          </button>
                         </div>
                       </td>
                       <td className="p-4">
@@ -305,11 +314,12 @@ export const TrackPage: React.FC = () => {
           </div>
         </div>
 
-        {/* LEADERBOARD COLUMN (Right - 30%) */}
         <div className="flex-1 flex flex-col overflow-hidden bg-dark-1000/60">
            <LeaderboardPanel />
         </div>
       </div>
+
+      <WhaleDetailsModal />
     </div>
   );
 };

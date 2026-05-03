@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 
 export const LeaderboardPanel: React.FC = () => {
-  const { leaderboard, setLeaderboard } = useStore();
+  const { leaderboard, setLeaderboard, setSelectedWhale } = useStore();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -74,9 +74,12 @@ export const LeaderboardPanel: React.FC = () => {
                       </div>
                       <div className="flex flex-col">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[11px] font-mono text-white">
+                          <button 
+                            onClick={() => setSelectedWhale({ address: entry.ethAddress, totalValue: entry.accountValue, withdrawable: '0', positions: [] })}
+                            className="text-[11px] font-mono text-white hover:text-brand-neon hover:underline transition-all"
+                          >
                             {entry.ethAddress.slice(0, 6)}...{entry.ethAddress.slice(-4)}
-                          </span>
+                          </button>
                           <ShieldCheck className="w-3 h-3 text-brand-neon" />
                         </div>
                         <span className="text-[9px] font-bold text-dark-500 uppercase tracking-tighter">Verified PnL</span>
