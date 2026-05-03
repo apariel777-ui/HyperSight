@@ -133,6 +133,8 @@ const TelegramAlertPanel = () => {
       
       if (res.ok) {
         setStatus('success');
+        // Deep-link to Telegram Bot with the user's handle to initialize
+        window.open(`https://t.me/HyperSightAlertBot?start=user_${tgUsername}`, '_blank');
         setTimeout(() => setStatus('idle'), 3000);
       } else {
         setStatus('error');
