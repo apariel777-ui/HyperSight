@@ -22,6 +22,14 @@ export interface Liquidation {
   usdValue: number;
 }
 
+export interface LeaderboardEntry {
+  ethAddress: string;
+  accountValue: string;
+  pnl: string;
+  winRate: number;
+  rank: number;
+}
+
 interface StoreState {
   selectedMarket: string;
   setSelectedMarket: (market: string) => void;
@@ -41,6 +49,8 @@ interface StoreState {
   addLiquidation: (liq: Liquidation) => void;
   tgUsername: string;
   setTgUsername: (username: string) => void;
+  leaderboard: LeaderboardEntry[];
+  setLeaderboard: (data: LeaderboardEntry[]) => void;
 }
 
 export const useStore = create<StoreState>((set) => ({
@@ -66,4 +76,6 @@ export const useStore = create<StoreState>((set) => ({
   })),
   tgUsername: '',
   setTgUsername: (username) => set({ tgUsername: username }),
+  leaderboard: [],
+  setLeaderboard: (data) => set({ leaderboard: data }),
 }));

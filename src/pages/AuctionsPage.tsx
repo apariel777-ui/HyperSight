@@ -235,11 +235,8 @@ export const AuctionsPage = () => {
       items.forEach((item, idx) => {
          // Attempt to find fields, ignore errors if it doesn't match spot/perp struct
          if (typeof item.startTimeSeconds !== 'undefined') {
-            // Filter out default/inactive structs where gas hasn't decayed or is exactly static
-            // This fixes the issue where Spot and Perp return identical timers but one has startGas == currentGas (not actively deploying)
-            if (item.startGas && item.currentGas && item.startGas === item.currentGas && item.startGas % 100 === 0) {
-              return; // likely a generic uninitialized state (like 500 static)
-            }
+            // If startGas is 0, it's likely a non-auction state
+            if (item.startGas === 0) return;
 
             const auction: RealAuction = {
               id: item.coin || item.name || `${type}-${idx}`,

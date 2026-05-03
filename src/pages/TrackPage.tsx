@@ -7,12 +7,14 @@ import {
   MousePointer2,
   Waves,
   Skull,
-  Flame
+  Flame,
+  Trophy
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
+import { LeaderboardPanel } from '../components/track/LeaderboardPanel';
 
-const WHALE_THRESHOLD = 5000;
+const WHALE_THRESHOLD = 100000;
 const HL_WS_URL = 'wss://api.hyperliquid.xyz/ws';
 
 const RADAR_COINS = ["BTC", "ETH", "SOL", "HYPE", "ARB", "AVAX", "DOGE", "SUI", "TIA", "OP"];
@@ -171,11 +173,11 @@ export const TrackPage: React.FC = () => {
         </div>
       </div>
 
-      {/* TWO COLUMN FEED */}
+      {/* THREE COLUMN TERMINAL */}
       <div className="flex-1 flex overflow-hidden">
         
-        {/* WHALE RADAR COLUMN */}
-        <div className="flex-1 flex flex-col border-r border-dark-900 overflow-hidden">
+        {/* WHALE RADAR COLUMN (Left - 40%) */}
+        <div className="flex-[1.5] flex flex-col border-r border-dark-900 overflow-hidden bg-dark-1000/20">
           <div className="p-4 bg-dark-1000/80 border-b border-dark-900 flex justify-between items-center">
              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2">
                <Waves className="w-3.5 h-3.5 text-blue-400" />
@@ -245,8 +247,8 @@ export const TrackPage: React.FC = () => {
           </div>
         </div>
 
-        {/* LIQUIDATION FEED COLUMN */}
-        <div className="w-[450px] flex flex-col overflow-hidden bg-dark-1000/30">
+        {/* LIQUIDATION FEED COLUMN (Middle - 30%) */}
+        <div className="flex-1 flex flex-col border-r border-dark-900 overflow-hidden bg-dark-1000/40">
           <div className="p-4 bg-dark-1000/80 border-b border-dark-900 flex justify-between items-center">
              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2">
                <Skull className="w-3.5 h-3.5 text-red-500" />
@@ -270,13 +272,6 @@ export const TrackPage: React.FC = () => {
                        liq.side === 'Long' ? "bg-red-500/5 border-red-500/20" : "bg-brand-neon/5 border-brand-neon/20"
                      )}
                    >
-                     <motion.div 
-                        initial={{ opacity: 0.5 }} 
-                        animate={{ opacity: 0 }} 
-                        transition={{ duration: 1 }}
-                        className={clsx("absolute inset-0 z-0", liq.side === 'Long' ? "bg-red-500" : "bg-brand-neon")} 
-                     />
-                     
                      <div className="relative z-10 flex justify-between items-start">
                         <div>
                           <div className="flex items-center gap-2 mb-1">
@@ -309,6 +304,11 @@ export const TrackPage: React.FC = () => {
                )}
              </div>
           </div>
+        </div>
+
+        {/* LEADERBOARD COLUMN (Right - 30%) */}
+        <div className="flex-1 flex flex-col overflow-hidden bg-dark-1000/60">
+           <LeaderboardPanel />
         </div>
       </div>
     </div>

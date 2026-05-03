@@ -223,7 +223,7 @@ app.post('/api/alerts/wallet', (req, res) => {
 
 // --- WHALE TRADE MONITOR (BACKEND) ---
 const monitorWs = new WebSocket('wss://api.hyperliquid.xyz/ws');
-const WHALE_MIN = 5000;
+const WHALE_MIN = 100000;
 const RADAR_COINS = ["BTC", "ETH", "SOL", "HYPE", "ARB", "AVAX", "DOGE", "SUI", "TIA", "OP"];
 
 monitorWs.on('open', () => {
