@@ -56,8 +56,11 @@ export const TrackPage: React.FC = () => {
   };
 
   const totalVolume = whaleTrades.reduce((acc, t) => acc + t.usdValue, 0);
-  const buyCount = whaleTrades.filter(t => t.side === 'B').length;
-  const sellCount = whaleTrades.filter(t => t.side === 'S').length;
+  const buyVolume = whaleTrades.filter(t => t.side?.toUpperCase().startsWith('B')).reduce((acc, t) => acc + t.usdValue, 0);
+  const sellVolume = whaleTrades.filter(t => t.side?.toUpperCase().startsWith('S')).reduce((acc, t) => acc + t.usdValue, 0);
+
+  const buyPercent = totalVolume > 0 ? Math.round((buyVolume / totalVolume) * 100) : 0;
+  const sellPercent = totalVolume > 0 ? 100 - buyPercent : 0;
 
   useEffect(() => {
     const connect = () => {
@@ -151,11 +154,11 @@ export const TrackPage: React.FC = () => {
           </div>
           <div className="flex items-center gap-3">
             <div className="text-2xl font-black text-brand-neon tracking-tighter">
-              {buyCount + sellCount > 0 ? Math.round((buyCount / (buyCount + sellCount)) * 100) : 0}%
+              {buyPercent}%
             </div>
             <div className="h-6 w-[1px] bg-dark-800" />
             <div className="text-2xl font-black text-red-500 tracking-tighter">
-              {buyCount + sellCount > 0 ? Math.round((sellCount / (buyCount + sellCount)) * 100) : 0}%
+              {sellPercent}%
             </div>
           </div>
         </div>
