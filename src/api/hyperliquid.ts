@@ -173,6 +173,15 @@ export const fetchPerpDeployAuctions = async (): Promise<any> => {
   return response.json();
 };
 
+export const fetchHip3Auctions = async (): Promise<any> => {
+  const response = await fetch(HYPERLIQUID_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'hip3DeployAuctionStatus' }),
+  });
+  return response.json();
+};
+
 export const fetchLeaderboard = async (): Promise<any> => {
   const response = await fetch(HYPERLIQUID_API_URL, {
     method: 'POST',

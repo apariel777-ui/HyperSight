@@ -13,7 +13,7 @@ import { useStore } from '../store';
 import clsx from 'clsx';
 import { LeaderboardPanel } from '../components/track/LeaderboardPanel';
 
-const WHALE_THRESHOLD = 100000;
+const WHALE_THRESHOLD = 60000;
 const HL_WS_URL = 'wss://api.hyperliquid.xyz/ws';
 
 const RADAR_COINS = ["BTC", "ETH", "SOL", "HYPE", "ARB", "AVAX", "DOGE", "SUI", "TIA", "OP"];

@@ -13,12 +13,13 @@ export const LeaderboardPanel: React.FC = () => {
     const load = async () => {
       try {
         const data = await fetchLeaderboard();
-        if (data && data.leaderboardEntries) {
-          // Hyperliquid returns a list of entries
-          const mapped = data.leaderboardEntries.slice(0, 10).map((entry: any, index: number) => ({
-            ethAddress: entry.ethAddress,
-            accountValue: entry.accountValue,
-            pnl: entry.pnl,
+        const rawEntries = data?.leaderboardEntries || data?.leaderboard || [];
+        
+        if (Array.isArray(rawEntries)) {
+          const mapped = rawEntries.slice(0, 10).map((entry: any, index: number) => ({
+            ethAddress: entry.ethAddress || entry.address || '0x...',
+            accountValue: entry.accountValue || entry.marginUsage || '0',
+            pnl: entry.pnl || entry.realizedPnl || '0',
             winRate: entry.winRate || 0,
             rank: index + 1
           }));

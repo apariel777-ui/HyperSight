@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { 
   fetchSpotDeployAuctions, 
   fetchPerpDeployAuctions, 
+  fetchHip3Auctions,
   HYPERLIQUID_WS_URL 
 } from '../api/hyperliquid';
 import { useStore } from '../store';
@@ -22,7 +23,7 @@ import clsx from 'clsx';
 // High-volume perp markets guaranteed to have live trades
 const LIVE_FEED_COINS = ['BTC', 'ETH', 'SOL', 'HYPE', 'ARB', 'DOGE', 'AVAX'];
 
-type AuctionType = 'Spot Deploy' | 'Perp Deploy' | 'HIP-6';
+type AuctionType = 'Spot Deploy' | 'Perp Deploy' | 'HIP-3' | 'HIP-6';
 
 interface RealAuction {
   id: string; // fallback if coin not provided
@@ -218,6 +219,12 @@ export const AuctionsPage = () => {
     refetchInterval: 5000 
   });
 
+  const { data: hip3Auctions } = useQuery({
+    queryKey: ['auctions', 'hip3'],
+    queryFn: fetchHip3Auctions,
+    refetchInterval: 5000 
+  });
+
   // Timer loop for localized sub-second accuracy
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 1000);
@@ -263,6 +270,7 @@ export const AuctionsPage = () => {
 
     processPayload(spotDeployAuctions, 'Spot Deploy');
     processPayload(perpDeployAuctions, 'Perp Deploy');
+    processPayload(hip3Auctions, 'HIP-3');
 
     // Deduplicate logic: if by some chance the API emits two auctions with the exact same startTime and duration,
     // they are likely bleeding states from the same deployment sequence in the RPC. We'll pick the one with active decay.
@@ -401,7 +409,7 @@ export const AuctionsPage = () => {
         {/* CONTROLS */}
         <div className="mb-6 flex gap-3">
            <div className="text-[10px] font-bold text-dark-500 uppercase flex items-center px-2">Filter by Type:</div>
-           {['All', 'Spot Deploy', 'Perp Deploy', 'HIP-6'].map(t => (
+           {['All', 'Spot Deploy', 'Perp Deploy', 'HIP-3', 'HIP-6'].map(t => (
              <button 
                 key={t}
                 onClick={() => setFilterType(t as any)}
