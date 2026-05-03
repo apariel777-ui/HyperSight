@@ -1,9 +1,23 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Gavel, Clock, Bell, Activity, History, Send, CheckCircle, AlertCircle } from 'lucide-react';
-import clsx from 'clsx';
 import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Activity, 
+  Gavel, 
+  Clock, 
+  History, 
+  Send, 
+  Bell, 
+  CheckCircle, 
+  AlertCircle 
+} from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchSpotDeployAuctions, fetchPerpDeployAuctions, HYPERLIQUID_WS_URL } from '../api/hyperliquid';
+import { 
+  fetchSpotDeployAuctions, 
+  fetchPerpDeployAuctions, 
+  HYPERLIQUID_WS_URL 
+} from '../api/hyperliquid';
+import { useStore } from '../store';
+import clsx from 'clsx';
 
 // High-volume perp markets guaranteed to have live trades
 const LIVE_FEED_COINS = ['BTC', 'ETH', 'SOL', 'HYPE', 'ARB', 'DOGE', 'AVAX'];

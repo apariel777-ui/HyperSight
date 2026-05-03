@@ -30,7 +30,9 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
   const [loading, setLoading] = useState(true);
 
   const userDrawings = useRef<any[]>([]);
+  const liquidationLines = useRef<any[]>([]);
   const lastCandles = useRef<any[]>([]);
+  const liquidations = useStore((s) => s.liquidations);
 
   // ── Initialize chart ──────────────────────────────────────────────────
   useEffect(() => {
@@ -209,6 +211,30 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
       clearInterval(refreshId);
     };
   }, [loadCandles]);
+
+  // ── LIQUIDATION HEATMAP OVERLAY ──────────────────────────────────────
+  useEffect(() => {
+    if (!candleSeriesRef.current) return;
+    
+    // Clear old liquidation lines
+    liquidationLines.current.forEach(line => candleSeriesRef.current.removePriceLine(line));
+    liquidationLines.current = [];
+
+    // Filter liquidations for this symbol
+    const activeLiqs = liquidations.filter(l => l.coin === symbol).slice(0, 5); // Show latest 5
+
+    activeLiqs.forEach(liq => {
+      const line = candleSeriesRef.current.createPriceLine({
+        price: parseFloat(liq.px),
+        color: liq.side === 'Long' ? 'rgba(255, 76, 76, 0.4)' : 'rgba(0, 255, 163, 0.4)',
+        lineWidth: 2,
+        lineStyle: 2, // LargeDashed
+        axisLabelVisible: true,
+        title: liq.side === 'Long' ? '💀 REKT' : '🔥 SQUEEZE',
+      });
+      liquidationLines.current.push(line);
+    });
+  }, [liquidations, symbol]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>

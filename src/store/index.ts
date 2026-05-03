@@ -12,6 +12,16 @@ export interface WhaleTrade {
   isSmartMoney?: boolean;
 }
 
+export interface Liquidation {
+  id: string;
+  coin: string;
+  side: 'Long' | 'Short';
+  px: string;
+  sz: string;
+  time: number;
+  usdValue: number;
+}
+
 interface StoreState {
   selectedMarket: string;
   setSelectedMarket: (market: string) => void;
@@ -27,6 +37,8 @@ interface StoreState {
   addTradeHistory: (trade: any) => void;
   whaleTrades: WhaleTrade[];
   addWhaleTrade: (trade: WhaleTrade) => void;
+  liquidations: Liquidation[];
+  addLiquidation: (liq: Liquidation) => void;
   tgUsername: string;
   setTgUsername: (username: string) => void;
 }
@@ -47,6 +59,10 @@ export const useStore = create<StoreState>((set) => ({
   whaleTrades: [],
   addWhaleTrade: (trade) => set((state) => ({ 
     whaleTrades: [trade, ...state.whaleTrades].slice(0, 100) 
+  })),
+  liquidations: [],
+  addLiquidation: (liq) => set((state) => ({ 
+    liquidations: [liq, ...state.liquidations].slice(0, 100) 
   })),
   tgUsername: '',
   setTgUsername: (username) => set({ tgUsername: username }),

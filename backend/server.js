@@ -226,20 +226,24 @@ const monitorWs = new WebSocket('wss://api.hyperliquid.xyz/ws');
 const WHALE_MIN = 25000;
 
 monitorWs.on('open', () => {
-    console.log('Backend Whale Radar Live');
+    console.log('Backend Radar Live (Whales & Liquidations)');
     ["BTC", "ETH", "SOL", "HYPE", "ARB", "AVAX"].forEach(coin => {
         monitorWs.send(JSON.stringify({ method: "subscribe", subscription: { type: "trades", coin } }));
+        monitorWs.send(JSON.stringify({ method: "subscribe", subscription: { type: "l3Events", coin } }));
     });
 });
 
+const cascadeState = {}; // { coin: { count: 0, lastTime: 0 } }
+
 monitorWs.on('message', (data) => {
     const msg = JSON.parse(data);
+    
+    // --- WHALE ALERTS ---
     if (msg.channel === 'trades' && msg.data) {
         msg.data.forEach(trade => {
             const val = parseFloat(trade.px) * parseFloat(trade.sz);
             if (val >= WHALE_MIN) {
                 const addr = trade.hash.toLowerCase();
-                // Check if anyone is tracking this wallet
                 db.all(`
                     SELECT t.chatId, w.walletAddress 
                     FROM telegram_alerts t
@@ -261,6 +265,36 @@ monitorWs.on('message', (data) => {
                 });
             }
         });
+    }
+
+    // --- LIQUIDATION CASCADES ---
+    if (msg.channel === 'l3Events' && msg.data && msg.data.isLiquidation) {
+        const liq = msg.data;
+        const val = parseFloat(liq.px) * parseFloat(liq.sz);
+        
+        // Cascade detection logic
+        const now = Date.now();
+        if (!cascadeState[liq.coin]) cascadeState[liq.coin] = { count: 0, lastTime: 0 };
+        
+        if (now - cascadeState[liq.coin].lastTime < 10000) {
+            cascadeState[liq.coin].count++;
+        } else {
+            cascadeState[liq.coin].count = 1;
+        }
+        cascadeState[liq.coin].lastTime = now;
+
+        // If 5 liquidations in 10s, alert everyone!
+        if (cascadeState[liq.coin].count === 5) {
+            const message = `🚨 **LIQUIDATION CASCADE DETECTED** 🚨\n\n` +
+                          `💎 Asset: **${liq.coin}**\n` +
+                          `💀 Event: Chain reaction of forced exits!\n` +
+                          `📉 Current Price: **$${parseFloat(liq.px).toLocaleString()}**\n\n` +
+                          `High volatility expected. Watch the heatmap.`;
+            
+            db.all(`SELECT chatId FROM telegram_alerts WHERE chatId IS NOT NULL`, (err, rows) => {
+                if (!err) rows.forEach(row => bot.sendMessage(row.chatId, message, { parse_mode: 'Markdown' }));
+            });
+        }
     }
 });
 
