@@ -145,8 +145,8 @@ const pollAuctions = async () => {
                  
                  // If it has ended, we ensure it's in the history DB
                  if (hasEnded) {
-                    const id = item.coin || item.name || `${item.startTimeSeconds}`;
-                    const token = item.coin || item.name || `${actType.split(' ')[0]} Asset`;
+                    const id = auction.coin || auction.name || `${auction.startTimeSeconds}`;
+                    const token = auction.coin || auction.name || `${actType.split(' ')[0]} Asset`;
                     
                     db.get(`SELECT id FROM history_auctions WHERE id = ?`, [id], (err, row) => {
                         if (!row) {
@@ -156,9 +156,9 @@ const pollAuctions = async () => {
                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                             `, [
                                 id, token, actType, 
-                                item.startTimeSeconds, item.durationSeconds, 
-                                item.startGas || 0, item.endGas || 0,
-                                item.currentGas || 0, // Fallback for settle price logic
+                                auction.startTimeSeconds, auction.durationSeconds, 
+                                auction.startGas || 0, auction.endGas || 0,
+                                auction.currentGas || 0, // Fallback for settle price logic
                                 Date.now()
                             ]);
                             console.log(`[Indexer] Archived settled auction: ${token}`);
@@ -166,7 +166,7 @@ const pollAuctions = async () => {
                     });
                  }
             }
-        });
+        }
     };
 
     checkAndLog(spot, 'Spot Deploy');
