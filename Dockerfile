@@ -19,20 +19,20 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:20-bookworm-slim
+FROM node:20-bookworm
 
 WORKDIR /app
 
-# Install runtime dependencies for sqlite3
-RUN apt-get update && apt-get install -y python3 && rm -rf /var/lib/apt/lists/*
+# Install build dependencies for native modules (sqlite3)
+RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
 # Copy built frontend and backend code
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/backend ./backend
 COPY --from=builder /app/package*.json ./
 
-# Install only production dependencies
-RUN npm install --production
+# Install only production dependencies - build sqlite3 from source
+RUN npm install --production --build-from-source=sqlite3
 
 # Create directory for SQLite database
 RUN mkdir -p /app/data && chmod 777 /app/data
