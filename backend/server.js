@@ -223,11 +223,12 @@ app.post('/api/alerts/wallet', (req, res) => {
 
 // --- WHALE TRADE MONITOR (BACKEND) ---
 const monitorWs = new WebSocket('wss://api.hyperliquid.xyz/ws');
-const WHALE_MIN = 25000;
+const WHALE_MIN = 5000;
+const RADAR_COINS = ["BTC", "ETH", "SOL", "HYPE", "ARB", "AVAX", "DOGE", "SUI", "TIA", "OP"];
 
 monitorWs.on('open', () => {
     console.log('Backend Radar Live (Whales & Liquidations)');
-    ["BTC", "ETH", "SOL", "HYPE", "ARB", "AVAX"].forEach(coin => {
+    RADAR_COINS.forEach(coin => {
         monitorWs.send(JSON.stringify({ method: "subscribe", subscription: { type: "trades", coin } }));
         monitorWs.send(JSON.stringify({ method: "subscribe", subscription: { type: "l3Events", coin } }));
     });

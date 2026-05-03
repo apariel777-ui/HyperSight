@@ -12,8 +12,10 @@ import {
 import { useStore } from '../store';
 import clsx from 'clsx';
 
-const WHALE_THRESHOLD = 25000;
+const WHALE_THRESHOLD = 5000;
 const HL_WS_URL = 'wss://api.hyperliquid.xyz/ws';
+
+const RADAR_COINS = ["BTC", "ETH", "SOL", "HYPE", "ARB", "AVAX", "DOGE", "SUI", "TIA", "OP"];
 
 const SMART_MONEY_WALLETS = [
   '0x6431945a6669b2d863f68ef8e747372b0c363b9f',
@@ -59,7 +61,7 @@ export const TrackPage: React.FC = () => {
       
       ws.current.onopen = () => {
         setIsConnected(true);
-        ["BTC", "ETH", "SOL", "HYPE", "ARB", "AVAX", "DOGE"].forEach(coin => {
+        RADAR_COINS.forEach(coin => {
           ws.current?.send(JSON.stringify({
             method: "subscribe",
             subscription: { type: "trades", coin }
