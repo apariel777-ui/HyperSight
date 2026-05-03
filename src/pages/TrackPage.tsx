@@ -3,8 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bell,
   TrendingUp,
-  ShieldCheck,
-  MousePointer2,
   Waves,
   Skull,
   Flame
@@ -24,24 +22,18 @@ const SMART_MONEY_WALLETS = [
   '0x8623b976269661a29f8c5b169f9e71b26938a9a6',
 ];
 
-interface LiquidationEvent {
-  id: string;
-  coin: string;
-  side: 'Long' | 'Short';
-  px: string;
-  usdValue: number;
-  user: string;
-}
+
 
 export const TrackPage: React.FC = () => {
   const whaleTrades = useStore((s) => s.whaleTrades);
   const addWhaleTrade = useStore((s) => s.addWhaleTrade);
   const liquidations = useStore((s) => s.liquidations);
-  const setLiquidations = useStore((s) => s.setLiquidations);
+  const addLiquidation = useStore((s) => s.addLiquidation);
   const tgUsername = useStore((s) => s.tgUsername);
   const setSelectedWhale = useStore((s) => s.setSelectedWhale);
   const [isConnected, setIsConnected] = useState(false);
   const ws = useRef<WebSocket | null>(null);
+  const processedHashes = useRef<Set<string>>(new Set());
 
   const handleSetAlert = async (walletAddress: string) => {
     if (!tgUsername) {
@@ -90,6 +82,12 @@ export const TrackPage: React.FC = () => {
         
         if (msg.channel === 'trades' && msg.data) {
           msg.data.forEach((trade: any) => {
+            // Deduplicate by hash
+            if (processedHashes.current.has(trade.hash)) return;
+            processedHashes.current.add(trade.hash);
+            // Limit set size
+            if (processedHashes.current.size > 500) processedHashes.current.clear();
+
             const usdValue = parseFloat(trade.px) * parseFloat(trade.sz);
             if (usdValue >= WHALE_THRESHOLD) {
               addWhaleTrade({
