@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useStore, WhalePosition } from '../../store';
+import { useStore } from '../../store';
+import type { WhalePosition } from '../../store';
 import { fetchWhaleState } from '../../api/hyperliquid';
 import { X, Briefcase, TrendingUp, TrendingDown, DollarSign, ExternalLink, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
