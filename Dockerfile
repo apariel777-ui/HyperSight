@@ -3,20 +3,20 @@ FROM node:20-bookworm AS builder
 
 WORKDIR /app
 
-# Install build dependencies for native modules (sqlite3)
+# Install build dependencies
 RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies with memory limit
+RUN NODE_OPTIONS="--max-old-space-size=4096" npm install
 
 # Copy all files
 COPY . .
 
-# Build the frontend
-RUN npm run build
+# Build the frontend with memory limit
+RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build
 
 # Production stage
 FROM node:20-bookworm
