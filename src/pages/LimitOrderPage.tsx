@@ -61,8 +61,7 @@ function buildSnapshot(book: RawBook): DepthSnapshot {
     totalAskUsd: aggAsks.reduce((s, b) => s + b.usdValue, 0) };
 }
 
-function startFeed(flush: (coin: string, snap: DepthSnapshot) => void) {
-  _storeFlush = flush;
+function startFeed() {
 
   // 1-second batch flush — writes buffered books into the store
   if (!_timer) {
@@ -155,9 +154,9 @@ export const LimitOrderPage: React.FC = () => {
 
   // Start feed once — keeps running even when user navigates away
   useEffect(() => {
-    startFeed((coin, snap) => setWallSnapshot(coin, snap));
+    startFeed();
     // no cleanup — intentional, feed stays alive
-  }, [setWallSnapshot]);
+  }, []);
 
   const snap      = wallSnapshots[activeCoin] as DepthSnapshot | undefined;
   const allBins = snap ? [...snap.bids, ...snap.asks] : [];
