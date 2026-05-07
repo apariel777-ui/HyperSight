@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bell,
   TrendingUp,
   Waves,
-  Skull,
-  Flame
+  Skull
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
@@ -98,7 +97,6 @@ export const TrackPage: React.FC = () => {
   const liquidations = useStore((s) => s.liquidations);
   const addLiquidation = useStore((s) => s.addLiquidation);
   const tgUsername = useStore((s) => s.tgUsername);
-  const setSelectedWhale = useStore((s) => s.setSelectedWhale);
 
   useEffect(() => {
     startRadarFeed(addWhaleTrade, addLiquidation);
