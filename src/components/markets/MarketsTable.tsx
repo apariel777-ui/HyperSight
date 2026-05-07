@@ -25,7 +25,7 @@ export const MarketsTable = () => {
 
   const handleRowClick = (marketName: string) => {
     setSelectedMarket(marketName);
-    navigate('/chart');
+    navigate(`/token/${marketName}`);
   };
 
   const filteredMarkets = (markets || []) as any[];

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { 
   Activity, 
   Gavel, 
@@ -469,7 +470,13 @@ export const AuctionsPage = () => {
                   <div className="flex justify-between items-start mb-4">
                      <div>
                        <div className="flex items-center gap-3">
-                         <h2 className="text-2xl font-black text-white tracking-tighter uppercase">{auction.token}</h2>
+                         <Link 
+                           to={`/token/${auction.token}`}
+                           className="text-2xl font-black text-white tracking-tighter uppercase hover:text-brand-neon transition-colors"
+                           onClick={(e) => e.stopPropagation()}
+                         >
+                           {auction.token}
+                         </Link>
                          <span className="px-2 py-0.5 text-[9px] font-black uppercase tracking-widest bg-dark-800 text-brand-neon border border-brand-neon/30 rounded">
                            {auction.type}
                          </span>

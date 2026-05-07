@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bell,
@@ -188,7 +189,9 @@ export const TrackPage: React.FC = () => {
                     >
                       <td className="p-3">
                         <div className="flex flex-col">
-                          <span className="text-[10px] font-black text-white">{trade.coin}</span>
+                          <Link to={`/token/${trade.coin}`} className="text-[10px] font-black text-white hover:text-brand-neon transition-colors">
+                            {trade.coin}
+                          </Link>
                           <span className={clsx("text-[8px] font-bold uppercase", trade.isSmartMoney ? "text-purple-400" : "text-dark-600")}>
                             {trade.isSmartMoney ? "Smart Whale" : "Whale"}
                           </span>

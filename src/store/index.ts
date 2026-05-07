@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export interface WhaleTrade {
   id: string;
@@ -84,44 +85,58 @@ interface StoreState {
   setWallSnapshot: (coin: string, snap: unknown) => void;
 }
 
-export const useStore = create<StoreState>((set) => ({
-  selectedMarket: 'BTC',
-  setSelectedMarket: (market) => set({ selectedMarket: market }),
-  selectedCategory: 'Crypto',
-  setSelectedCategory: (category) => set({ selectedCategory: category }),
-  activeDrawingTool: 'crosshair',
-  setActiveDrawingTool: (tool) => set({ activeDrawingTool: tool }),
-  drawingBuffer: null,
-  setDrawingBuffer: (point) => set({ drawingBuffer: point }),
-  openPositions: [],
-  setOpenPositions: (positions) => set({ openPositions: positions }),
-  tradeHistory: [],
-  addTradeHistory: (trade) => set((state) => ({ tradeHistory: [trade, ...state.tradeHistory] })),
-  whaleTrades: [],
-  addWhaleTrade: (trade) => set((state) => ({ 
-    whaleTrades: [trade, ...state.whaleTrades].slice(0, 100) 
-  })),
-  liquidations: [],
-  addLiquidation: (liq) => set((state) => ({ 
-    liquidations: [liq, ...state.liquidations].slice(0, 100) 
-  })),
-  tgUsername: '',
-  setTgUsername: (username) => set({ tgUsername: username }),
-  leaderboard: [],
-  setLeaderboard: (data) => set({ leaderboard: data }),
-  selectedWhale: null,
-  setSelectedWhale: (data: WhalePortfolio | null) => set({ selectedWhale: data }),
-  wallSnapshots: {},
-  setWallSnapshot: (coin, snap) => set((state) => ({
-    wallSnapshots: { ...state.wallSnapshots, [coin]: snap }
-  })),
-  limitOrders: [],
-  setLimitOrders: (orders) => set({ limitOrders: orders }),
-  addLimitOrder: (order: LimitOrder) => set((state) => {
-    // Keep only unique orders per coin/px/side
-    const filtered = state.limitOrders.filter(o => 
-      !(o.coin === order.coin && o.px === order.px && o.side === order.side)
-    );
-    return { limitOrders: [order, ...filtered].slice(0, 500) };
-  }),
-}));
+export const useStore = create<StoreState>()(
+  persist(
+    (set) => ({
+      selectedMarket: 'BTC',
+      setSelectedMarket: (market) => set({ selectedMarket: market }),
+      selectedCategory: 'Crypto',
+      setSelectedCategory: (category) => set({ selectedCategory: category }),
+      activeDrawingTool: 'crosshair',
+      setActiveDrawingTool: (tool) => set({ activeDrawingTool: tool }),
+      drawingBuffer: null,
+      setDrawingBuffer: (point) => set({ drawingBuffer: point }),
+      openPositions: [],
+      setOpenPositions: (positions) => set({ openPositions: positions }),
+      tradeHistory: [],
+      addTradeHistory: (trade) => set((state) => ({ tradeHistory: [trade, ...state.tradeHistory] })),
+      whaleTrades: [],
+      addWhaleTrade: (trade) => set((state) => ({ 
+        whaleTrades: [trade, ...state.whaleTrades].slice(0, 100) 
+      })),
+      liquidations: [],
+      addLiquidation: (liq) => set((state) => ({ 
+        liquidations: [liq, ...state.liquidations].slice(0, 100) 
+      })),
+      tgUsername: '',
+      setTgUsername: (username) => set({ tgUsername: username }),
+      leaderboard: [],
+      setLeaderboard: (data) => set({ leaderboard: data }),
+      selectedWhale: null,
+      setSelectedWhale: (data: WhalePortfolio | null) => set({ selectedWhale: data }),
+      wallSnapshots: {},
+      setWallSnapshot: (coin, snap) => set((state) => ({
+        wallSnapshots: { ...state.wallSnapshots, [coin]: snap }
+      })),
+      limitOrders: [],
+      setLimitOrders: (orders) => set({ limitOrders: orders }),
+      addLimitOrder: (order: LimitOrder) => set((state) => {
+        const filtered = state.limitOrders.filter(o => 
+          !(o.coin === order.coin && o.px === order.px && o.side === order.side)
+        );
+        return { limitOrders: [order, ...filtered].slice(0, 500) };
+      }),
+    }),
+    {
+      name: 'hypersight-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ 
+        whaleTrades: state.whaleTrades, 
+        liquidations: state.liquidations,
+        tgUsername: state.tgUsername,
+        limitOrders: state.limitOrders,
+        tradeHistory: state.tradeHistory
+      }),
+    }
+  )
+);

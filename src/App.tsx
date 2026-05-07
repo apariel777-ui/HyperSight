@@ -7,6 +7,7 @@ import { ChartPage } from './pages/ChartPage';
 import { AuctionsPage } from './pages/AuctionsPage';
 import { TrackPage } from './pages/TrackPage';
 import { LimitOrderPage } from './pages/LimitOrderPage';
+import { TokenPage } from './pages/TokenPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,7 +17,10 @@ const queryClient = new QueryClient({
 
 function AppContent() {
   const location = useLocation();
-  const isFixedLayout = location.pathname === '/chart' || location.pathname === '/track' || location.pathname === '/walls';
+  const isFixedLayout = location.pathname === '/chart' || 
+                        location.pathname === '/track' || 
+                        location.pathname === '/walls' ||
+                        location.pathname.startsWith('/token/');
 
   return (
     <div className="min-h-screen bg-dark-900 text-white font-sans flex flex-col">
@@ -35,6 +39,7 @@ function AppContent() {
           <Route path="/auctions" element={<AuctionsPage />} />
           <Route path="/track" element={<TrackPage />} />
           <Route path="/walls" element={<LimitOrderPage />} />
+          <Route path="/token/:symbol" element={<TokenPage />} />
         </Routes>
       </main>
     </div>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { ExternalLink, TrendingUp, TrendingDown, Activity, BarChart2 } from 'lucide-react';
 import clsx from 'clsx';
 import { useStore } from '../store';
@@ -172,7 +173,15 @@ export const LimitOrderPage: React.FC = () => {
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black uppercase tracking-tighter text-white">Order Walls</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-black uppercase tracking-tighter text-white">Order Walls</h1>
+            <Link 
+              to={`/token/${activeCoin}`}
+              className="px-2 py-0.5 bg-dark-800 text-brand-neon text-[9px] font-black rounded border border-brand-neon/30 hover:bg-brand-neon hover:text-dark-1000 transition-all uppercase"
+            >
+              View {activeCoin} Profile
+            </Link>
+          </div>
           <p className="text-dark-500 text-xs font-mono mt-0.5">Aggregated limit orders within ±5% of mid · live from Hyperliquid L1</p>
         </div>
         <a href="https://app.hyperliquid.xyz" target="_blank" rel="noopener noreferrer"
