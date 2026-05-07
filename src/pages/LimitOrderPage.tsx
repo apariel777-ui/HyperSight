@@ -150,7 +150,6 @@ const PressureGauge: React.FC<{ buyUsd: number; sellUsd: number }> = ({ buyUsd, 
 export const LimitOrderPage: React.FC = () => {
   const [activeCoin, setActiveCoin] = useState('BTC');
   const wallSnapshots = useStore(s => s.wallSnapshots) as Record<string, DepthSnapshot>;
-  const setWallSnapshot = useStore(s => s.setWallSnapshot);
 
   // Start feed once — keeps running even when user navigates away
   useEffect(() => {
