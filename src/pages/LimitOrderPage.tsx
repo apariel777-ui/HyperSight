@@ -118,7 +118,7 @@ const DepthRow: React.FC<{
   const isBid = side === 'bid';
 
   return (
-    <div className="relative flex items-center h-8 overflow-hidden group">
+    <div className="relative flex items-center h-10 overflow-hidden group">
       {/* Bar */}
       <div
         className={clsx(
@@ -238,7 +238,7 @@ export const LimitOrderPage: React.FC = () => {
   const totalSellUsdAll = Array.from(snapshots.values()).reduce((s, v) => s + v.totalAskUsd, 0);
 
   return (
-    <div className="flex flex-col h-full bg-dark-1000 p-6 gap-5 overflow-hidden">
+    <div className="flex flex-col h-full bg-dark-1000 p-4 gap-4 overflow-hidden">
 
       {/* HEADER */}
       <div className="flex items-center justify-between shrink-0">
@@ -261,7 +261,7 @@ export const LimitOrderPage: React.FC = () => {
       </div>
 
       {/* STATS ROW */}
-      <div className="grid grid-cols-3 gap-5 shrink-0">
+      <div className="grid grid-cols-3 gap-4 shrink-0">
         <PressureGauge buyUsd={totalBuyUsdAll} sellUsd={totalSellUsdAll} />
 
         <div className="p-5 rounded-2xl bg-dark-950 border border-dark-800">
@@ -307,10 +307,10 @@ export const LimitOrderPage: React.FC = () => {
       </div>
 
       {/* DEPTH BOOK */}
-      <div className="flex-1 overflow-hidden grid grid-cols-2 gap-4">
+      <div className="flex-1 min-h-0 overflow-hidden grid grid-cols-2 gap-4">
 
         {/* BID SIDE */}
-        <div className="flex flex-col bg-dark-950 border border-dark-800 rounded-2xl overflow-hidden">
+        <div className="flex flex-col min-h-0 bg-dark-950 border border-dark-800 rounded-2xl overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-dark-900 bg-dark-900/50 shrink-0">
             <div className="flex items-center gap-2 text-brand-neon">
@@ -338,7 +338,7 @@ export const LimitOrderPage: React.FC = () => {
         </div>
 
         {/* ASK SIDE */}
-        <div className="flex flex-col bg-dark-950 border border-dark-800 rounded-2xl overflow-hidden">
+        <div className="flex flex-col min-h-0 bg-dark-950 border border-dark-800 rounded-2xl overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-dark-900 bg-dark-900/50 shrink-0">
             <div className="flex items-center gap-2 text-red-400">
