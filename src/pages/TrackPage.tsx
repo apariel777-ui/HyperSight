@@ -205,16 +205,26 @@ export const TrackPage: React.FC = () => {
                       <td className="p-3 text-right">
                         <span className="text-[11px] font-black text-white">${trade.usdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                       </td>
-                      <td className="p-3 text-right">
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation(); // don't open modal
-                            handleSetAlert(trade.hash);
-                          }} 
-                          className="p-1.5 bg-dark-800 hover:bg-brand-neon hover:text-dark-1000 rounded transition-all"
-                        >
-                          <Bell className="w-3 h-3" />
-                        </button>
+                      <td className="p-3">
+                        <div className="flex items-center justify-center gap-2">
+                          <button 
+                            className="p-1.5 hover:bg-dark-800 rounded-lg text-dark-500 hover:text-white transition-all"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSetAlert(trade.hash);
+                            }}
+                          >
+                            <Bell className="w-4 h-4" />
+                          </button>
+                          <Link 
+                            to={`/token/${trade.coin}`}
+                            className="p-1.5 hover:bg-brand-neon/20 rounded-lg text-dark-500 hover:text-brand-neon transition-all"
+                            onClick={(e) => e.stopPropagation()}
+                            title="Open Token Profile"
+                          >
+                            <BarChart2 className="w-4 h-4" />
+                          </Link>
+                        </div>
                       </td>
                     </motion.tr>
                   ))}

@@ -49,36 +49,43 @@ export const MarketsTable = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between bg-dark-900/30 p-2 rounded-xl border border-dark-800/50">
-        <div className="flex gap-1 p-1 bg-dark-1000/50 rounded-lg overflow-x-auto no-scrollbar">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={clsx(
-                "px-4 py-2 rounded-md text-xs font-bold uppercase transition-all whitespace-nowrap",
-                selectedCategory === cat 
-                  ? "bg-dark-800 text-brand-neon border border-brand-neon/20 shadow-[0_0_10px_rgba(0,255,163,0.1)]"
-                  : "text-dark-500 hover:text-white hover:bg-dark-800/30"
-              )}
-            >
-              {cat}
-            </button>
-          ))}
+      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between bg-dark-950/80 p-4 rounded-2xl border border-dark-800 shadow-2xl backdrop-blur-md">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-black text-white tracking-tighter uppercase">Markets Explorer</h1>
+          <p className="text-[10px] text-dark-500 font-black uppercase tracking-widest">Select an asset to open its terminal profile</p>
         </div>
-
-        <div className="relative w-full md:w-72">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-dark-500" />
+        
+        <div className="flex gap-4 items-center w-full md:w-auto">
+          <div className="relative w-full md:w-72">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 text-dark-500" />
+            </div>
+            <input
+              type="text"
+              className="block w-full pl-10 pr-3 py-2.5 border border-dark-800 rounded-xl bg-dark-1000 text-sm text-white placeholder-dark-600 focus:outline-none focus:border-brand-neon transition-all"
+              placeholder="Jump to Token Profile (e.g. SOL)..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
-          <input
-            type="text"
-            className="block w-full pl-10 pr-3 py-2 border border-dark-800 rounded-lg bg-dark-1000 text-sm text-white placeholder-dark-600 focus:outline-none focus:border-brand-neon"
-            placeholder={`Search ${selectedCategory}...`}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
         </div>
+      </div>
+
+      <div className="flex gap-1 p-1 bg-dark-1000/50 rounded-xl overflow-x-auto no-scrollbar border border-dark-800/50">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={clsx(
+              "px-6 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
+              selectedCategory === cat 
+                ? "bg-brand-neon text-dark-1000 shadow-[0_0_20px_rgba(0,255,163,0.3)]"
+                : "text-dark-500 hover:text-white hover:bg-dark-800/50"
+            )}
+          >
+            {cat}
+          </button>
+        ))}
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-dark-700/50 bg-dark-800/20">
