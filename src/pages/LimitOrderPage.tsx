@@ -9,7 +9,8 @@ import {
   Target,
   Zap,
   Activity,
-  ShieldAlert
+  ShieldAlert,
+  ExternalLink
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
@@ -110,8 +111,26 @@ export const LimitOrderPage: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full bg-dark-1000 p-6 overflow-hidden">
+      {/* PAGE HEADER */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-black uppercase tracking-tighter text-white">Order Walls</h1>
+          <p className="text-dark-500 text-xs font-mono mt-1">Large unfilled limit orders (&gt; $100K) streaming live from Hyperliquid order books</p>
+        </div>
+        <a
+          href="https://app.hyperliquid.xyz"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 px-4 py-2 bg-dark-950 border border-brand-neon/30 rounded-xl text-[10px] font-black uppercase tracking-widest text-brand-neon hover:bg-brand-neon/10 transition-all"
+        >
+          <span className="w-2 h-2 rounded-full bg-brand-neon animate-pulse" />
+          Live: Hyperliquid L1 On-Chain
+          <ExternalLink className="w-3 h-3" />
+        </a>
+      </div>
+
       {/* SUMMARY STATS */}
-      <div className="grid grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-3 gap-6 mb-6">
         <div className="p-6 rounded-2xl bg-dark-950 border border-dark-800 shadow-[0_0_30px_rgba(0,0,0,0.3)]">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-dark-500 mb-2 flex items-center gap-2">
             <Target className="w-3.5 h-3.5 text-brand-neon" /> Total Walls Detected
@@ -244,6 +263,15 @@ export const LimitOrderPage: React.FC = () => {
                         >
                           <Bell className="w-4 h-4" />
                         </button>
+                        <a 
+                          href={`https://app.hyperliquid.xyz/explorer/coin/${order.coin}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 bg-dark-800 hover:bg-purple-500 rounded-lg transition-all"
+                          title="Verify On-Chain"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
                       </div>
                     </td>
                   </motion.tr>
