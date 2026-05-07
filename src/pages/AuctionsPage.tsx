@@ -250,7 +250,7 @@ export const AuctionsPage = () => {
 
             const auction: RealAuction = {
               id: item.coin || item.name || `${type}-${idx}`,
-              token: item.coin || item.name || `${type.split(' ')[0]} Asset`,
+              token: item.coin || item.name || 'Pending...',
               type,
               startTimeSeconds: item.startTimeSeconds,
               durationSeconds: item.durationSeconds,
@@ -321,10 +321,13 @@ export const AuctionsPage = () => {
           const data = JSON.parse(event.data);
           if (data.channel === 'trades' && Array.isArray(data.data)) {
             data.data.forEach((t: any) => {
+              // Only show real trades with valid hashes for verification
+              if (!t.hash || t.hash.startsWith('0x000000')) return;
+
               const newBid: BidEvent = {
-                id: t.hash || `${t.coin}-${t.time}-${Math.random()}`,
+                id: t.hash,
                 token: t.coin || 'Unknown',
-                bidder: `0x...${t.hash ? t.hash.slice(-4) : '????'}`,
+                bidder: `${t.hash.slice(0, 6)}...${t.hash.slice(-4)}`,
                 amount: t.sz,
                 price: t.px,
                 timestamp: t.time || Date.now()
@@ -452,7 +455,12 @@ export const AuctionsPage = () => {
                     "bg-dark-950 rounded-xl p-6 border shadow-2xl relative overflow-hidden transition-all duration-500 group cursor-pointer hover:border-brand-neon/50",
                     urgencyClass.includes('glow-red') ? "border-brand-red shadow-[0_0_20px_rgba(255,76,76,0.15)]" : "border-dark-800"
                   )}
-                  onClick={() => window.open(`https://hypurrscan.io/token/${auction.token}`, '_blank')}
+                  onClick={() => {
+                    const url = auction.token === 'Pending...' 
+                      ? 'https://hypurrscan.io/auctions' 
+                      : `https://hypurrscan.io/token/${auction.token}`;
+                    window.open(url, '_blank');
+                  }}
                 >
                   <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
                     <ExternalLink className="w-4 h-4 text-brand-neon" />
@@ -466,7 +474,9 @@ export const AuctionsPage = () => {
                            {auction.type}
                          </span>
                        </div>
-                       <p className="text-dark-400 text-[10px] mt-1 font-mono uppercase tracking-[0.2em] font-black">Verify on Hypurrscan</p>
+                       <p className="text-dark-400 text-[10px] mt-1 font-mono uppercase tracking-[0.2em] font-black">
+                         {auction.token === 'Pending...' ? 'Verify on Explorer' : 'Verify on Hypurrscan'}
+                       </p>
                      </div>
                      <div className={clsx("flex items-center gap-2 px-3 py-1.5 rounded border bg-dark-900 shadow-inner", urgencyClass)}>
                         <Clock className="w-4 h-4" />
