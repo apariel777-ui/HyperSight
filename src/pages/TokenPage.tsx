@@ -3,14 +3,11 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ChevronLeft, 
   ExternalLink, 
-  TrendingUp, 
-  TrendingDown, 
   Activity, 
   BarChart2, 
   Waves, 
   History,
   Info,
-  DollarSign,
   Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -150,7 +147,7 @@ export const TokenPage: React.FC = () => {
         {/* LEFT PANEL: CHART & WALLS */}
         <div className="flex-[2.5] flex flex-col border-r border-dark-900 overflow-hidden">
           <div className="flex-1 border-b border-dark-900 relative">
-            <TradingChart coin={symbol || 'BTC'} />
+            <TradingChart symbol={symbol || 'BTC'} />
           </div>
           
           <div className="h-[280px] shrink-0 flex">
