@@ -23,7 +23,6 @@ type RawBook  = { coin: string; time: number; levels: [RawLevel[], RawLevel[]] }
 const _books  = new Map<string, RawBook>();           // raw WS buffer
 let   _ws: WebSocket | null = null;
 let   _timer: ReturnType<typeof setInterval> | null = null;
-let   _storeFlush: ((coin: string, snap: DepthSnapshot) => void) | null = null;
 
 function aggregateBook(levels: RawLevel[], midPrice: number, isBid: boolean): PriceBin[] {
   if (!levels.length || midPrice === 0) return [];

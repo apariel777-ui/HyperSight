@@ -93,9 +93,7 @@ function startRadarFeed() {
 
 export const TrackPage: React.FC = () => {
   const whaleTrades = useStore((s) => s.whaleTrades);
-  const addWhaleTrade = useStore((s) => s.addWhaleTrade);
   const liquidations = useStore((s) => s.liquidations);
-  const addLiquidation = useStore((s) => s.addLiquidation);
   const tgUsername = useStore((s) => s.tgUsername);
 
   useEffect(() => {
