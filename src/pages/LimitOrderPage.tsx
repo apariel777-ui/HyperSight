@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ExternalLink, TrendingUp, TrendingDown, Activity, BarChart2 } from 'lucide-react';
 import clsx from 'clsx';
