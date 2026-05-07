@@ -238,7 +238,7 @@ export const LimitOrderPage: React.FC = () => {
   const totalSellUsdAll = Array.from(snapshots.values()).reduce((s, v) => s + v.totalAskUsd, 0);
 
   return (
-    <div className="flex flex-col h-full bg-dark-1000 p-4 gap-4 overflow-hidden">
+    <div className="flex flex-col bg-dark-1000 p-4 gap-4 overflow-y-auto">
 
       {/* HEADER */}
       <div className="flex items-center justify-between shrink-0">
@@ -307,10 +307,10 @@ export const LimitOrderPage: React.FC = () => {
       </div>
 
       {/* DEPTH BOOK */}
-      <div className="flex-1 min-h-0 overflow-hidden grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4">
 
         {/* BID SIDE */}
-        <div className="flex flex-col min-h-0 bg-dark-950 border border-dark-800 rounded-2xl overflow-hidden">
+        <div className="flex flex-col bg-dark-950 border border-dark-800 rounded-2xl overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-dark-900 bg-dark-900/50 shrink-0">
             <div className="flex items-center gap-2 text-brand-neon">
@@ -324,7 +324,7 @@ export const LimitOrderPage: React.FC = () => {
             <span>Price</span><span className="text-center">Dist%</span><span className="text-right">USD Value</span>
           </div>
           {/* Rows */}
-          <div className="flex-1 overflow-y-auto divide-y divide-dark-900/50">
+          <div className="divide-y divide-dark-900/50">
             {snap?.bids.map((bin, i) => (
               <DepthRow key={i} bin={bin} maxUsd={maxUsd} side="bid" midPrice={snap.midPrice} />
             ))}
@@ -338,7 +338,7 @@ export const LimitOrderPage: React.FC = () => {
         </div>
 
         {/* ASK SIDE */}
-        <div className="flex flex-col min-h-0 bg-dark-950 border border-dark-800 rounded-2xl overflow-hidden">
+        <div className="flex flex-col bg-dark-950 border border-dark-800 rounded-2xl overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-dark-900 bg-dark-900/50 shrink-0">
             <div className="flex items-center gap-2 text-red-400">
@@ -352,7 +352,7 @@ export const LimitOrderPage: React.FC = () => {
             <span>Price</span><span className="text-center">Dist%</span><span className="text-right">USD Value</span>
           </div>
           {/* Rows */}
-          <div className="flex-1 overflow-y-auto divide-y divide-dark-900/50">
+          <div className="divide-y divide-dark-900/50">
             {snap?.asks.map((bin, i) => (
               <DepthRow key={i} bin={bin} maxUsd={maxUsd} side="ask" midPrice={snap.midPrice} />
             ))}
