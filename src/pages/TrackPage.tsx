@@ -5,7 +5,8 @@ import {
   Bell,
   TrendingUp,
   Waves,
-  Skull
+  Skull,
+  BarChart2
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
