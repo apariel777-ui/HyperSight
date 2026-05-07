@@ -9,6 +9,7 @@ export const Navbar = () => {
     { name: 'Track', path: '/track', icon: Eye },
     { name: 'Walls', path: '/walls', icon: Layers },
     { name: 'Auctions', path: '/auctions', icon: Gavel },
+    { name: 'Token', path: '/tokens', icon: Zap },
   ];
 
   return (

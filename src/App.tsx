@@ -8,6 +8,7 @@ import { AuctionsPage } from './pages/AuctionsPage';
 import { TrackPage } from './pages/TrackPage';
 import { LimitOrderPage } from './pages/LimitOrderPage';
 import { TokenPage } from './pages/TokenPage';
+import { TokensListingPage } from './pages/TokensListingPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -39,6 +40,7 @@ function AppContent() {
           <Route path="/auctions" element={<AuctionsPage />} />
           <Route path="/track" element={<TrackPage />} />
           <Route path="/walls" element={<LimitOrderPage />} />
+          <Route path="/tokens" element={<TokensListingPage />} />
           <Route path="/token/:symbol" element={<TokenPage />} />
         </Routes>
       </main>

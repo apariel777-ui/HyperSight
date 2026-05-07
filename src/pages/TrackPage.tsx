@@ -190,9 +190,7 @@ export const TrackPage: React.FC = () => {
                     >
                       <td className="p-3">
                         <div className="flex flex-col">
-                          <Link to={`/token/${trade.coin}`} className="text-[10px] font-black text-white hover:text-brand-neon transition-colors">
-                            {trade.coin}
-                          </Link>
+                          <span className="text-[10px] font-black text-white">{trade.coin}</span>
                           <span className={clsx("text-[8px] font-bold uppercase", trade.isSmartMoney ? "text-purple-400" : "text-dark-600")}>
                             {trade.isSmartMoney ? "Smart Whale" : "Whale"}
                           </span>
@@ -206,26 +204,16 @@ export const TrackPage: React.FC = () => {
                       <td className="p-3 text-right">
                         <span className="text-[11px] font-black text-white">${trade.usdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                       </td>
-                      <td className="p-3">
-                        <div className="flex items-center justify-center gap-2">
-                          <button 
-                            className="p-1.5 hover:bg-dark-800 rounded-lg text-dark-500 hover:text-white transition-all"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleSetAlert(trade.hash);
-                            }}
-                          >
-                            <Bell className="w-4 h-4" />
-                          </button>
-                          <Link 
-                            to={`/token/${trade.coin}`}
-                            className="p-1.5 hover:bg-brand-neon/20 rounded-lg text-dark-500 hover:text-brand-neon transition-all"
-                            onClick={(e) => e.stopPropagation()}
-                            title="Open Token Profile"
-                          >
-                            <BarChart2 className="w-4 h-4" />
-                          </Link>
-                        </div>
+                      <td className="p-3 text-right">
+                        <button 
+                          className="p-1.5 bg-dark-800 hover:bg-brand-neon hover:text-dark-1000 rounded transition-all"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSetAlert(trade.hash);
+                          }}
+                        >
+                          <Bell className="w-3 h-3" />
+                        </button>
                       </td>
                     </motion.tr>
                   ))}

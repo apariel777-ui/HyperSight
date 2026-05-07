@@ -214,3 +214,12 @@ export const fetchWhaleState = async (user: string): Promise<any> => {
   });
   return response.json();
 };
+
+export const fetchSpotMeta = async (): Promise<any> => {
+  const response = await fetch(HYPERLIQUID_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'spotMeta' }),
+  });
+  return response.json();
+};
