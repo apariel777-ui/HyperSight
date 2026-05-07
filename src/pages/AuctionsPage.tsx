@@ -445,11 +445,18 @@ export const AuctionsPage = () => {
                 <motion.div 
                   layout
                   key={auction.id} 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   className={clsx(
-                    "bg-dark-950 rounded-xl p-6 border shadow-2xl relative overflow-hidden transition-all duration-500",
+                    "bg-dark-950 rounded-xl p-6 border shadow-2xl relative overflow-hidden transition-all duration-500 group cursor-pointer hover:border-brand-neon/50",
                     urgencyClass.includes('glow-red') ? "border-brand-red shadow-[0_0_20px_rgba(255,76,76,0.15)]" : "border-dark-800"
                   )}
+                  onClick={() => window.open(`https://hypurrscan.io/token/${auction.token}`, '_blank')}
                 >
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ExternalLink className="w-4 h-4 text-brand-neon" />
+                  </div>
+
                   <div className="flex justify-between items-start mb-4">
                      <div>
                        <div className="flex items-center gap-3">
@@ -458,7 +465,7 @@ export const AuctionsPage = () => {
                            {auction.type}
                          </span>
                        </div>
-                       <p className="text-dark-400 text-[10px] mt-1 font-mono uppercase tracking-[0.2em] font-black">Live Gas Decay Active</p>
+                       <p className="text-dark-400 text-[10px] mt-1 font-mono uppercase tracking-[0.2em] font-black">Verify on Hypurrscan</p>
                      </div>
                      <div className={clsx("flex items-center gap-2 px-3 py-1.5 rounded border bg-dark-900 shadow-inner", urgencyClass)}>
                         <Clock className="w-4 h-4" />
@@ -569,31 +576,37 @@ export const AuctionsPage = () => {
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           <AnimatePresence initial={false}>
             {bids.map(bid => (
-              <motion.div 
+              <motion.a 
                 key={bid.id}
+                href={`https://hypurrscan.io/tx/${bid.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="bg-dark-900 border border-dark-800 rounded-lg p-3 text-sm relative overflow-hidden group"
+                className="bg-dark-900 border border-dark-800 rounded-lg p-3 text-sm relative overflow-hidden group block hover:border-brand-neon/30 transition-all"
               >
                 {/* Ping effect on spawn */}
                 <div className="absolute inset-0 bg-brand-neon/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                 
                 <div className="flex justify-between items-start mb-2">
-                  <span className="font-mono text-[10px] text-brand-neon">{bid.token}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[10px] text-brand-neon font-black uppercase">{bid.token}</span>
+                    <ExternalLink className="w-2.5 h-2.5 text-dark-600 group-hover:text-brand-neon" />
+                  </div>
                   <span className="font-mono text-[10px] text-dark-500">{new Date(bid.timestamp).toLocaleTimeString()}</span>
                 </div>
                 
                 <div className="flex justify-between items-end">
                    <div>
-                     <div className="text-[10px] font-bold text-dark-600 uppercase tracking-widest mb-0.5">Bidder</div>
-                     <div className="font-mono text-xs text-white">Wallet {bid.bidder}</div>
+                     <div className="text-[10px] font-bold text-dark-600 uppercase tracking-widest mb-0.5">Bidder Signature</div>
+                     <div className="font-mono text-[11px] text-white/80">{bid.bidder}</div>
                    </div>
                    <div className="text-right flex flex-col items-end">
-                     <span className="font-mono text-dark-300 text-xs">bid {bid.amount.toLocaleString()} size</span>
-                     <span className="font-mono text-brand-neon font-bold text-[10px]">at {bid.price.toLocaleString()} price</span>
+                     <span className="font-mono text-dark-300 text-xs">{parseFloat(bid.amount as string).toLocaleString()} size</span>
+                     <span className="font-mono text-brand-neon font-black text-[10px]">at {parseFloat(bid.price as string).toLocaleString()} px</span>
                    </div>
                 </div>
-              </motion.div>
+              </motion.a>
             ))}
           </AnimatePresence>
 
