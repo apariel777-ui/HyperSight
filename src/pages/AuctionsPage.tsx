@@ -8,7 +8,8 @@ import {
   Send, 
   Bell, 
   CheckCircle, 
-  AlertCircle 
+  AlertCircle,
+  ExternalLink
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { 
