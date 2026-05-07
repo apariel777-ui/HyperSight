@@ -69,7 +69,7 @@ function startFeed(flush: (coin: string, snap: DepthSnapshot) => void) {
   if (!_timer) {
     _timer = setInterval(() => {
       _books.forEach((book, coin) => {
-        _storeFlush?.(coin, buildSnapshot(book));
+        useStore.getState().setWallSnapshot(coin, buildSnapshot(book));
       });
     }, UPDATE_MS);
   }
@@ -161,7 +161,10 @@ export const LimitOrderPage: React.FC = () => {
   }, [setWallSnapshot]);
 
   const snap      = wallSnapshots[activeCoin] as DepthSnapshot | undefined;
-  const maxUsd    = snap ? Math.max(...snap.bids.map(b => b.usdValue), ...snap.asks.map(a => a.usdValue), 1) : 1;
+  const allBins = snap ? [...snap.bids, ...snap.asks] : [];
+  const maxUsd = allBins.length > 0 
+    ? allBins.reduce((max, b) => Math.max(max, b.usdValue), 1) 
+    : 1;
   const allSnaps  = Object.values(wallSnapshots) as DepthSnapshot[];
   const totalBuy  = allSnaps.reduce((s, v) => s + v.totalBidUsd, 0);
   const totalSell = allSnaps.reduce((s, v) => s + v.totalAskUsd, 0);

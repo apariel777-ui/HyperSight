@@ -24,10 +24,7 @@ let _ws: WebSocket | null = null;
 let _processedHashes = new Set<string>();
 let _isInitialized = false;
 
-function startRadarFeed(
-  addWhaleTrade: (trade: any) => void, 
-  addLiquidation: (liq: any) => void
-) {
+function startRadarFeed() {
   if (_isInitialized) return;
   _isInitialized = true;
 
@@ -47,20 +44,23 @@ function startRadarFeed(
           msg.data.forEach((trade: any) => {
             if (_processedHashes.has(trade.hash)) return;
             _processedHashes.add(trade.hash);
-            if (_processedHashes.size > 1000) _processedHashes.clear();
+            if (_processedHashes.size > 5000) _processedHashes.clear();
 
             const usdValue = parseFloat(trade.px) * parseFloat(trade.sz);
             if (usdValue >= WHALE_THRESHOLD) {
-              addWhaleTrade({
+              // HL WS trades have users[0] as the active address
+              const walletAddress = trade.users ? trade.users[0] : trade.hash; 
+              
+              useStore.getState().addWhaleTrade({
                 id: `${trade.hash}-${trade.time}`,
                 coin: trade.coin,
                 side: trade.side,
                 px: trade.px,
                 sz: trade.sz,
                 time: trade.time,
-                hash: trade.hash,
+                hash: walletAddress, // correctly use user address instead of tx hash
                 usdValue: usdValue,
-                isSmartMoney: SMART_MONEY_WALLETS.includes(trade.hash.toLowerCase())
+                isSmartMoney: SMART_MONEY_WALLETS.includes(walletAddress.toLowerCase())
               });
             }
           });
@@ -68,7 +68,7 @@ function startRadarFeed(
 
         if (msg.channel === 'liquidations' && msg.data) {
           const liq = msg.data;
-          addLiquidation({
+          useStore.getState().addLiquidation({
             id: Math.random().toString(36).substr(2, 9),
             coin: liq.coin,
             side: liq.side === 'B' ? 'Short' : 'Long', 
@@ -99,8 +99,8 @@ export const TrackPage: React.FC = () => {
   const tgUsername = useStore((s) => s.tgUsername);
 
   useEffect(() => {
-    startRadarFeed(addWhaleTrade, addLiquidation);
-  }, [addWhaleTrade, addLiquidation]);
+    startRadarFeed();
+  }, []);
 
   const handleSetAlert = async (walletAddress: string) => {
     if (!tgUsername) {
@@ -176,7 +176,18 @@ export const TrackPage: React.FC = () => {
               <tbody className="divide-y divide-dark-900/50">
                 <AnimatePresence initial={false}>
                   {whaleTrades.map((trade) => (
-                    <motion.tr key={trade.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-dark-900/30 transition-all group">
+                    <motion.tr 
+                      key={trade.id} 
+                      initial={{ opacity: 0 }} 
+                      animate={{ opacity: 1 }} 
+                      className="hover:bg-dark-900/30 transition-all group cursor-pointer"
+                      onClick={() => useStore.getState().setSelectedWhale({
+                        address: trade.hash,
+                        totalValue: '0',
+                        withdrawable: '0',
+                        positions: []
+                      })}
+                    >
                       <td className="p-3">
                         <div className="flex flex-col">
                           <span className="text-[10px] font-black text-white">{trade.coin}</span>
@@ -194,7 +205,13 @@ export const TrackPage: React.FC = () => {
                         <span className="text-[11px] font-black text-white">${trade.usdValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                       </td>
                       <td className="p-3 text-right">
-                        <button onClick={() => handleSetAlert(trade.hash)} className="p-1.5 bg-dark-800 hover:bg-brand-neon hover:text-dark-1000 rounded transition-all">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation(); // don't open modal
+                            handleSetAlert(trade.hash);
+                          }} 
+                          className="p-1.5 bg-dark-800 hover:bg-brand-neon hover:text-dark-1000 rounded transition-all"
+                        >
                           <Bell className="w-3 h-3" />
                         </button>
                       </td>
