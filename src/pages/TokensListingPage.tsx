@@ -6,8 +6,6 @@ import {
   ArrowUpRight, 
   ArrowDownRight, 
   Activity, 
-  Zap, 
-  Filter,
   ExternalLink,
   Coins
 } from 'lucide-react';
@@ -19,13 +17,13 @@ export const TokensListingPage: React.FC = () => {
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<'Perp' | 'Spot'>('Spot');
 
-  const { data: perps, isLoading: loadingPerps } = useQuery({
+  const { data: perps } = useQuery({
     queryKey: ['markets', 'Crypto'],
     queryFn: () => fetchMarkets('Crypto'),
     refetchInterval: 5000
   });
 
-  const { data: spot, isLoading: loadingSpot } = useQuery({
+  const { data: spot } = useQuery({
     queryKey: ['spotMeta'],
     queryFn: fetchSpotMeta
   });

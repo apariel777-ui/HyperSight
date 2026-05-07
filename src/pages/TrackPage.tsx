@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Bell,
   TrendingUp,
   Waves,
-  Skull,
-  BarChart2
+  Skull
 } from 'lucide-react';
 import { useStore } from '../store';
 import clsx from 'clsx';
