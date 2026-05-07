@@ -80,6 +80,8 @@ interface StoreState {
   addLimitOrder: (order: LimitOrder) => void;
   selectedWhale: WhalePortfolio | null;
   setSelectedWhale: (data: WhalePortfolio | null) => void;
+  wallSnapshots: Record<string, unknown>;
+  setWallSnapshot: (coin: string, snap: unknown) => void;
 }
 
 export const useStore = create<StoreState>((set) => ({
@@ -109,6 +111,10 @@ export const useStore = create<StoreState>((set) => ({
   setLeaderboard: (data) => set({ leaderboard: data }),
   selectedWhale: null,
   setSelectedWhale: (data: WhalePortfolio | null) => set({ selectedWhale: data }),
+  wallSnapshots: {},
+  setWallSnapshot: (coin, snap) => set((state) => ({
+    wallSnapshots: { ...state.wallSnapshots, [coin]: snap }
+  })),
   limitOrders: [],
   setLimitOrders: (orders) => set({ limitOrders: orders }),
   addLimitOrder: (order: LimitOrder) => set((state) => {
