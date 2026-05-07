@@ -276,9 +276,9 @@ export const AuctionsPage = () => {
 
     // Deduplicate logic: if by some chance the API emits two auctions with the exact same startTime and duration,
     // they are likely bleeding states from the same deployment sequence in the RPC. We'll pick the one with active decay.
-    const dedupedMap = new Map<number, RealAuction>();
+    const dedupedMap = new Map<string, RealAuction>();
     combined.forEach(auction => {
-      const key = auction.startTimeSeconds;
+      const key = `${auction.token}-${auction.startTimeSeconds}`;
       if (dedupedMap.has(key)) {
          const existing = dedupedMap.get(key)!;
          if (auction.currentGas !== undefined && existing.currentGas !== undefined) {
@@ -294,7 +294,7 @@ export const AuctionsPage = () => {
     });
 
     return Array.from(dedupedMap.values());
-  }, [spotDeployAuctions, perpDeployAuctions]);
+  }, [spotDeployAuctions, perpDeployAuctions, hip3Auctions]);
 
   // WebSocket — always subscribe to real high-volume perp markets for live feed
   const wsRef = useRef<WebSocket | null>(null);
@@ -434,6 +434,13 @@ export const AuctionsPage = () => {
               const timeLeftMs = Math.max(endTimeMs - now, 0);
               const urgencyClass = getUrgencyColor(timeLeftMs, totalDurationMs);
 
+              // Sub-second interpolation for "Live Decay" effect
+              const elapsedSec = Math.max(0, now / 1000 - auction.startTimeSeconds);
+              const decayProgress = Math.min(elapsedSec / auction.durationSeconds, 1);
+              const interpolatedGas = Math.round(auction.startGas - decayProgress * (auction.startGas - auction.endGas));
+              
+              const liveAuction = { ...auction, currentGas: interpolatedGas };
+
               return (
                 <motion.div 
                   layout
@@ -446,36 +453,40 @@ export const AuctionsPage = () => {
                   <div className="flex justify-between items-start mb-4">
                      <div>
                        <div className="flex items-center gap-3">
-                         <h2 className="text-2xl font-black text-white tracking-tighter">{auction.token}</h2>
+                         <h2 className="text-2xl font-black text-white tracking-tighter uppercase">{auction.token}</h2>
                          <span className="px-2 py-0.5 text-[9px] font-black uppercase tracking-widest bg-dark-800 text-brand-neon border border-brand-neon/30 rounded">
                            {auction.type}
                          </span>
                        </div>
-                       <p className="text-dark-400 text-xs mt-1 font-mono">Live Gas Decay</p>
+                       <p className="text-dark-400 text-[10px] mt-1 font-mono uppercase tracking-[0.2em] font-black">Live Gas Decay Active</p>
                      </div>
-                     <div className={clsx("flex items-center gap-2 px-3 py-1.5 rounded border bg-dark-900", urgencyClass)}>
+                     <div className={clsx("flex items-center gap-2 px-3 py-1.5 rounded border bg-dark-900 shadow-inner", urgencyClass)}>
                         <Clock className="w-4 h-4" />
                         <span className="font-mono font-bold">{formatTime(timeLeftMs)}</span>
                      </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 my-6">
-                    <div className="bg-dark-900 p-4 rounded-lg border border-dark-800">
+                    <div className="bg-dark-900 p-4 rounded-lg border border-dark-800 relative group/gas">
                       <div className="text-[10px] font-bold uppercase tracking-widest text-dark-500 mb-1">Current Gas</div>
-                      <div className="text-xl font-mono text-white">{(auction.currentGas ?? 0).toLocaleString()}</div>
+                      <div className="text-2xl font-mono text-brand-neon glow-text">
+                        {interpolatedGas.toLocaleString()}
+                      </div>
+                      <div className="absolute bottom-1 right-2 text-[8px] text-dark-600 font-mono italic">live decay</div>
                     </div>
                     <div className="bg-dark-900 p-4 rounded-lg border border-dark-800">
                       <div className="text-[10px] font-bold uppercase tracking-widest text-dark-500 mb-1">Start Gas</div>
-                      <div className="text-xl font-mono text-dark-300">{auction.startGas.toLocaleString()}</div>
+                      <div className="text-xl font-mono text-dark-400">{auction.startGas.toLocaleString()}</div>
                     </div>
                   </div>
 
                   {/* VISUAL GAS DECAY */}
                   <div className="pt-4 border-t border-dark-800/50">
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-dark-500 flex justify-between">
-                      <span>Gas Decay Curve (Live Network)</span>
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-dark-500 flex justify-between mb-2">
+                      <span>L1 Network Decay Curve</span>
+                      <span className="text-brand-neon">{Math.round((1 - decayProgress) * 100)}% Time Left</span>
                     </div>
-                    <PriceDecayCurve auction={auction} />
+                    <PriceDecayCurve auction={liveAuction} />
                   </div>
                 </motion.div>
               );
