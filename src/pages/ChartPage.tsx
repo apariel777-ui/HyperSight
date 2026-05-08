@@ -13,12 +13,12 @@ export const ChartPage = () => {
   const [selectedInterval, setSelectedInterval] = useState('1h');
 
   const { data: markets } = useQuery({
-    queryKey: ['markets'],
-    queryFn: () => fetchMarkets(),
-    refetchInterval: 5000,
+    queryKey: ['markets', 'Crypto'],
+    queryFn: () => fetchMarkets('Crypto'),
+    refetchInterval: 3000,
   });
 
-  const market = Array.isArray(markets) ? markets.find((m) => m.name === selectedMarket) : undefined;
+  const stats = markets?.find(m => m.name === selectedMarket);
 
   return (
     <div className="flex h-[calc(100vh-64px)] overflow-hidden bg-dark-1000">
@@ -47,10 +47,10 @@ export const ChartPage = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xl font-mono font-bold text-white leading-tight">
-                    {market?.markPx.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    {stats?.markPx.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </span>
-                  <span className={clsx("text-xs font-bold", (market?.change24h || 0) >= 0 ? "text-brand-neon" : "text-brand-red")}>
-                    {(market?.change24h || 0) >= 0 ? '+' : ''}{market?.change24h?.toFixed(2)}%
+                  <span className={clsx("text-xs font-bold", (stats?.change24h || 0) >= 0 ? "text-brand-neon" : "text-brand-red")}>
+                    {(stats?.change24h || 0) >= 0 ? '+' : ''}{stats?.change24h?.toFixed(2)}%
                   </span>
                 </div>
               </div>

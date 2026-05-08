@@ -486,7 +486,7 @@ export const AuctionsPage = () => {
                   onClick={() => {
                     const url = auction.token === 'Pending...' 
                       ? 'https://hypurrscan.io/auctions' 
-                      : `https://hypurrscan.io/token/${auction.token}`;
+                      : `https://hypurrscan.io/market/${auction.token}`;
                     window.open(url, '_blank');
                   }}
                 >

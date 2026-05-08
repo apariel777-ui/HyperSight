@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ChevronLeft, 
@@ -26,9 +27,14 @@ interface Trade {
 export const TokenPage: React.FC = () => {
   const { symbol } = useParams<{ symbol: string }>();
   const navigate = useNavigate();
-  const [stats, setStats] = useState<any>(null);
+  const { data: markets, isLoading: marketsLoading } = useQuery({
+    queryKey: ['markets', 'Crypto'],
+    queryFn: () => fetchMarkets('Crypto'),
+    refetchInterval: 3000,
+  });
+
+  const stats = markets?.find(m => m.name === symbol);
   const [recentTrades, setRecentTrades] = useState<Trade[]>([]);
-  const [loading, setLoading] = useState(true);
   
   const whaleTrades = useStore(s => s.whaleTrades);
   const wallSnapshots = useStore(s => s.wallSnapshots) as Record<string, any>;
@@ -43,20 +49,6 @@ export const TokenPage: React.FC = () => {
 
   useEffect(() => {
     if (!symbol) return;
-
-    const loadStats = async () => {
-      try {
-        const allMarkets = await fetchMarkets('Crypto');
-        const market = allMarkets.find(m => m.name === symbol);
-        if (market) setStats(market);
-      } catch (err) {
-        console.error('Failed to load token stats', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadStats();
 
     // WS for live trades
     const ws = new WebSocket(HYPERLIQUID_WS_URL);
@@ -75,7 +67,7 @@ export const TokenPage: React.FC = () => {
     return () => ws.close();
   }, [symbol]);
 
-  if (loading) {
+  if (marketsLoading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-dark-1000">
         <div className="flex flex-col items-center gap-4">
@@ -144,7 +136,7 @@ export const TokenPage: React.FC = () => {
           <div className="text-right">
             <div className="text-[9px] font-black text-dark-500 uppercase tracking-widest mb-1">Explorer</div>
             <a 
-              href={`https://hypurrscan.io/?search=${symbol}`} 
+              href={`https://hypurrscan.io/market/${symbol}`} 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-brand-neon hover:underline flex items-center gap-1 text-[11px] font-black uppercase tracking-widest"

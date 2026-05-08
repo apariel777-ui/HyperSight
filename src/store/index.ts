@@ -91,7 +91,7 @@ interface StoreState {
 export const useStore = create<StoreState>()(
   persist(
     (set) => ({
-      selectedMarket: 'BTC',
+      selectedMarket: 'HYPE',
       setSelectedMarket: (market) => set({ selectedMarket: market }),
       selectedCategory: 'Crypto',
       setSelectedCategory: (category) => set({ selectedCategory: category }),

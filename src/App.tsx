@@ -35,7 +35,7 @@ function AppContent() {
         }
       >
         <Routes>
-          <Route path="/" element={<MarketsPage />} />
+          <Route path="/" element={<ChartPage />} />
           <Route path="/chart" element={<ChartPage />} />
           <Route path="/auctions" element={<AuctionsPage />} />
           <Route path="/track" element={<TrackPage />} />
