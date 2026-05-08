@@ -122,15 +122,21 @@ export const TokenPage: React.FC = () => {
           <div className="text-right">
             <div className="text-[9px] font-black text-dark-500 uppercase tracking-widest mb-1">24h Volume</div>
             <div className="text-sm font-black text-white tracking-tight">
-              {stats?.volume24h >= 1e9 ? `$${(stats?.volume24h / 1e9).toFixed(2)}B` : `$${(stats?.volume24h / 1e6).toFixed(2)}M`}
+              {stats?.volume24h && stats.volume24h >= 1e9 
+                ? `$${(stats.volume24h / 1e9).toFixed(2)}B` 
+                : stats?.volume24h 
+                  ? `$${(stats.volume24h / 1e6).toFixed(2)}M` 
+                  : '$0.00M'}
             </div>
           </div>
           <div className="text-right">
             <div className="text-[9px] font-black text-dark-500 uppercase tracking-widest mb-1">Open Interest</div>
             <div className="text-sm font-black text-white tracking-tight">
-              {((stats?.openInterest || 0) * (stats?.markPx || 0)) >= 1e6 
-                ? `$${((stats?.openInterest || 0) * (stats?.markPx || 0) / 1e6).toFixed(2)}M`
-                : `$${((stats?.openInterest || 0) * (stats?.markPx || 0) / 1e3).toFixed(1)}K`}
+              {stats?.openInterest && stats?.markPx && (stats.openInterest * stats.markPx) >= 1e6 
+                ? `$${(stats.openInterest * stats.markPx / 1e6).toFixed(2)}M`
+                : stats?.openInterest && stats?.markPx
+                  ? `$${(stats.openInterest * stats.markPx / 1e3).toFixed(1)}K`
+                  : '$0.0K'}
             </div>
           </div>
           <div className="text-right">
