@@ -1,7 +1,6 @@
 import { MarketsTable } from '../components/markets/MarketsTable';
 import { useStore } from '../store';
 import { AlertCircle } from 'lucide-react';
-import clsx from 'clsx';
 
 export const MarketsPage = () => {
   const selectedCategory = useStore((s) => s.selectedCategory);

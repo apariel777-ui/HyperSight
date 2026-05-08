@@ -15,7 +15,7 @@ interface TradingChartProps {
   interval?: string;
 }
 
-const TIMEFRAMES = ['1m', '5m', '15m', '1h', '4h', '1d'];
+
 
 export const TradingChart: React.FC<TradingChartProps> = ({ symbol, interval = '1h' }) => {
   const activeTool = useStore((s) => s.activeDrawingTool);
@@ -28,7 +28,6 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol, interval = '
   const candleSeriesRef = useRef<any>(null);
   const volumeSeriesRef = useRef<any>(null);
   const [timeframe, setTimeframe] = useState(interval);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setTimeframe(interval);
@@ -157,9 +156,8 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol, interval = '
   }, [activeTool, setActiveTool, drawingBuffer, setDrawingBuffer]);
 
   // ── High Frequency REAL-TIME Data Polling ────────────────────────────
-  const loadCandles = useCallback(async (isInitial = false) => {
+    const loadCandles = useCallback(async (isInitial = false) => {
     if (!candleSeriesRef.current || !volumeSeriesRef.current || !chartRef.current) return;
-    if (isInitial) setLoading(true);
     
     try {
       const raw = await fetchCandles(symbol, timeframe, 200);
@@ -196,8 +194,6 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol, interval = '
       lastCandles.current = candles;
     } catch (err) {
       console.error('[TradingChart] loading error:', err);
-    } finally {
-      if (isInitial) setLoading(false);
     }
   }, [symbol, timeframe]);
 

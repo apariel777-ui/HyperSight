@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Shield, Globe, Cpu, Zap, SignalHigh, AlertTriangle } from 'lucide-react';
 import clsx from 'clsx';
@@ -169,7 +169,7 @@ export const LatencyPage = () => {
         </div>
 
         <div className="flex-1 flex items-end gap-1 px-4 pb-4">
-           {history.map((h, i) => (
+           {history.map((h) => (
              <motion.div 
                key={h.time}
                initial={{ height: 0 }}
