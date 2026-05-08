@@ -131,7 +131,11 @@ export const MarketsTable = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right font-mono">
-                  <div className="text-sm text-white">${(market.volume24h / 1000000).toFixed(2)}M</div>
+                  <div className="text-sm text-white">
+                    {market.volume24h >= 1e9 
+                      ? `$${(market.volume24h / 1e9).toFixed(2)}B` 
+                      : `$${(market.volume24h / 1e6).toFixed(2)}M`}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right font-mono">
                   <div className="text-sm text-dark-200">{market.openInterest.toFixed(2)}</div>

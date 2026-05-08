@@ -98,6 +98,25 @@ export const TrackPage: React.FC = () => {
 
   useEffect(() => {
     startRadarFeed();
+    
+    // Fetch initial history from backend
+    const fetchHistory = async () => {
+      try {
+        const res = await fetch('/api/whale-trades/recent');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data)) {
+          data.data.forEach((t: any) => {
+            useStore.getState().addWhaleTrade({
+              ...t,
+              isSmartMoney: Boolean(t.isSmartMoney)
+            });
+          });
+        }
+      } catch (e) {
+        console.error('Failed to load whale history');
+      }
+    };
+    fetchHistory();
   }, []);
 
   const handleSetAlert = async (walletAddress: string) => {

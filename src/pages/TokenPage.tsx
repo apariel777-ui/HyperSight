@@ -88,6 +88,14 @@ export const TokenPage: React.FC = () => {
 
   return (
     <div className="flex-1 flex flex-col bg-dark-1000 overflow-hidden">
+      {useStore.getState().selectedCategory !== 'Crypto' && (
+        <div className="bg-brand-red/10 border-b border-brand-red/20 px-4 py-1.5 flex items-center justify-center gap-2 z-30">
+          <span className="text-[10px] font-black uppercase tracking-widest text-brand-red animate-pulse">
+            ⚠️ Simulated Data — Institutional market proxy under maintenance
+          </span>
+        </div>
+      )}
+      
       {/* HEADER STATS */}
       <div className="h-20 shrink-0 border-b border-dark-900 bg-dark-1000/50 backdrop-blur-xl flex items-center px-6 justify-between">
         <div className="flex items-center gap-6">
@@ -121,11 +129,17 @@ export const TokenPage: React.FC = () => {
         <div className="flex gap-8">
           <div className="text-right">
             <div className="text-[9px] font-black text-dark-500 uppercase tracking-widest mb-1">24h Volume</div>
-            <div className="text-sm font-black text-white tracking-tight">${(stats?.volume24h / 1000000).toFixed(2)}M</div>
+            <div className="text-sm font-black text-white tracking-tight">
+              {stats?.volume24h >= 1e9 ? `$${(stats?.volume24h / 1e9).toFixed(2)}B` : `$${(stats?.volume24h / 1e6).toFixed(2)}M`}
+            </div>
           </div>
           <div className="text-right">
             <div className="text-[9px] font-black text-dark-500 uppercase tracking-widest mb-1">Open Interest</div>
-            <div className="text-sm font-black text-white tracking-tight">${((stats?.openInterest || 0) * (stats?.markPx || 0) / 1000000).toFixed(2)}M</div>
+            <div className="text-sm font-black text-white tracking-tight">
+              {((stats?.openInterest || 0) * (stats?.markPx || 0)) >= 1e6 
+                ? `$${((stats?.openInterest || 0) * (stats?.markPx || 0) / 1e6).toFixed(2)}M`
+                : `$${((stats?.openInterest || 0) * (stats?.markPx || 0) / 1e3).toFixed(1)}K`}
+            </div>
           </div>
           <div className="text-right">
             <div className="text-[9px] font-black text-dark-500 uppercase tracking-widest mb-1">Explorer</div>
@@ -237,13 +251,20 @@ export const TokenPage: React.FC = () => {
             <div className="flex-1 overflow-auto p-4 flex flex-col justify-center items-center bg-dark-1000/20">
               {tokenWall ? (
                  <div className="w-full space-y-4">
-                    <div className="flex justify-between items-end gap-1 h-32">
-                       {/* Simple visual representation of walls */}
-                       {[...Array(20)].map((_, i) => (
+                    <div className="flex items-end gap-1 h-32">
+                       {/* Real visual representation of walls */}
+                       {tokenWall.asks.slice(0, 10).reverse().map((bin: any, i: number) => (
                          <div 
-                           key={i} 
-                           className={clsx("flex-1 rounded-t-sm transition-all duration-500", i < 10 ? "bg-red-500/20" : "bg-brand-neon/20")}
-                           style={{ height: `${20 + Math.random() * 80}%` }}
+                           key={`ask-${i}`} 
+                           className="flex-1 bg-red-500/20 rounded-t-sm transition-all duration-500"
+                           style={{ height: `${Math.min(100, (bin.usdValue / (tokenWall.totalAskUsd || 1)) * 300 + 5)}%` }}
+                         />
+                       ))}
+                       {tokenWall.bids.slice(0, 10).map((bin: any, i: number) => (
+                         <div 
+                           key={`bid-${i}`} 
+                           className="flex-1 bg-brand-neon/20 rounded-t-sm transition-all duration-500"
+                           style={{ height: `${Math.min(100, (bin.usdValue / (tokenWall.totalBidUsd || 1)) * 300 + 5)}%` }}
                          />
                        ))}
                     </div>
@@ -289,7 +310,7 @@ export const TokenPage: React.FC = () => {
                       <div className={clsx("text-[10px] font-black uppercase tracking-widest", t.side === 'B' ? "text-brand-neon" : "text-red-500")}>
                         {t.side === 'B' ? 'WHALE BUY' : 'WHALE SELL'}
                       </div>
-                      <div className="text-[9px] font-mono text-dark-500 mt-0.5">{t.hash.slice(0, 10)}...</div>
+                      <div className="text-[9px] font-mono text-dark-500 mt-0.5">{t.user.slice(0, 8)}...</div>
                     </div>
                     <div className="text-right font-black text-white text-[12px]">
                       ${(t.usdValue / 1000).toFixed(0)}K

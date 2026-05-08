@@ -51,6 +51,21 @@ db.serialize(() => {
       UNIQUE(username, walletAddress)
     )
   `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS whale_trades (
+      id TEXT PRIMARY KEY,
+      coin TEXT,
+      side TEXT,
+      px TEXT,
+      sz TEXT,
+      time INTEGER,
+      hash TEXT,
+      user TEXT,
+      usdValue REAL,
+      isSmartMoney INTEGER
+    )
+  `);
 });
 
 // Initialize Telegram Bot
@@ -184,6 +199,20 @@ app.get('/api/auctions/history', (req, res) => {
     });
 });
 
+app.get('/api/proxy/markets/:category', async (req, res) => {
+    const { category } = req.params;
+    // For now, we still simulate non-crypto, but we could add Yahoo Finance here
+    // But we'll at least make it central.
+    res.json({ success: true, message: 'Proxy data under development' });
+});
+
+app.get('/api/whale-trades/recent', (req, res) => {
+    db.all(`SELECT * FROM whale_trades ORDER BY time DESC LIMIT 100`, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ success: true, data: rows });
+    });
+});
+
 app.post('/api/alerts/telegram', (req, res) => {
     const { username } = req.body;
     if (!username) return res.status(400).json({ error: 'Username required' });
@@ -244,7 +273,15 @@ monitorWs.on('message', (data) => {
         msg.data.forEach(trade => {
             const val = parseFloat(trade.px) * parseFloat(trade.sz);
             if (val >= WHALE_MIN) {
-                const addr = trade.hash.toLowerCase();
+                const addr = (trade.user || '').toLowerCase();
+                if (!addr) return;
+                
+                const id = `${trade.hash}-${trade.time}`;
+                db.run(`
+                    INSERT OR IGNORE INTO whale_trades (id, coin, side, px, sz, time, hash, user, usdValue, isSmartMoney)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `, [id, trade.coin, trade.side, trade.px, trade.sz, trade.time, trade.hash, addr, val, 0]);
+
                 db.all(`
                     SELECT t.chatId, w.walletAddress 
                     FROM telegram_alerts t
