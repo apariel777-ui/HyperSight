@@ -9,7 +9,7 @@ export interface WhaleTrade {
   sz: string;
   time: number;
   hash: string;    // Transaction hash
-  address: string; // Wallet address
+  user: string;    // Wallet address
   usdValue: number;
   isSmartMoney?: boolean;
 }

@@ -29,6 +29,14 @@ export const ChartPage = () => {
         {/* CHART CONTENT WRAPPER (Column for Overlay, Toolbar, and Chart) */}
         <div className="flex-1 relative flex flex-col min-w-0">
           
+          {useStore.getState().selectedCategory !== 'Crypto' && (
+            <div className="bg-brand-red/10 border-b border-brand-red/20 px-4 py-1.5 flex items-center justify-center gap-2 z-30">
+              <span className="text-[10px] font-black uppercase tracking-widest text-brand-red animate-pulse">
+                ⚠️ Simulated Data — Institutional market proxy under maintenance
+              </span>
+            </div>
+          )}
+          
           {/* CHART OVERLAY: Top Left Info */}
           <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
             <div className="bg-dark-950/90 backdrop-blur-md border border-dark-800/80 p-3 rounded-xl shadow-2xl flex items-center gap-4 min-w-[200px]">

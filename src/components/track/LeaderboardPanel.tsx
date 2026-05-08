@@ -25,12 +25,14 @@ export const LeaderboardPanel: React.FC = () => {
           try {
             const state = await fetchWhaleState(addr);
             const accountValue = state?.marginSummary?.accountValue || '0';
-            const pnl = state?.marginSummary?.unrealizedPnl || '0';
+            const assetPositions = state?.assetPositions || [];
+            const realPnl = assetPositions.reduce((acc: number, p: any) => 
+              acc + parseFloat(p.position?.unrealizedPnl || '0'), 0);
             
             return {
               ethAddress: addr,
               accountValue: accountValue,
-              pnl: pnl,
+              pnl: realPnl.toString(),
               activeTrades: whaleTrades.filter(t => t.address === addr).length
             };
           } catch (e) {

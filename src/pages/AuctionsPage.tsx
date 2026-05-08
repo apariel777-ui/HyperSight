@@ -282,7 +282,10 @@ export const AuctionsPage = () => {
 
     processPayload(spotDeployAuctions, 'Spot Deploy');
     processPayload(perpDeployAuctions, 'Perp Deploy');
-    processPayload(hip3Auctions, 'HIP-3');
+    
+    if (hip3Auctions && !hip3Auctions.__fetchError) {
+      processPayload(hip3Auctions, 'HIP-3');
+    }
 
     // Deduplicate logic: if by some chance the API emits two auctions with the exact same startTime and duration,
     // they are likely bleeding states from the same deployment sequence in the RPC. We'll pick the one with active decay.
@@ -306,6 +309,11 @@ export const AuctionsPage = () => {
     return Array.from(dedupedMap.values());
   }, [spotDeployAuctions, perpDeployAuctions, hip3Auctions]);
 
+  const auctionCoinsRef = useRef<string[]>([]);
+  useEffect(() => {
+    auctionCoinsRef.current = activeAuctions.map(a => a.token);
+  }, [activeAuctions]);
+
   // WebSocket — always subscribe to real high-volume perp markets for live feed
   const wsRef = useRef<WebSocket | null>(null);
   const subscribedCoins = useRef<Set<string>>(new Set());
@@ -317,8 +325,8 @@ export const AuctionsPage = () => {
 
       ws.onopen = () => {
         subscribedCoins.current.clear();
-        // Subscribe to high-volume perps
-        LIVE_FEED_COINS.forEach(coin => {
+        const allCoins = Array.from(new Set([...LIVE_FEED_COINS, ...auctionCoinsRef.current]));
+        allCoins.forEach(coin => {
           ws.send(JSON.stringify({ method: 'subscribe', subscription: { type: 'trades', coin } }));
           subscribedCoins.current.add(coin);
         });
@@ -333,7 +341,7 @@ export const AuctionsPage = () => {
               const newBid: BidEvent = {
                 id: t.hash,
                 token: t.coin || 'Unknown',
-                bidder: `${t.hash.slice(0, 6)}...${t.hash.slice(-4)}`,
+                bidder: t.user || 'Unknown',
                 amount: t.sz,
                 price: t.px,
                 timestamp: t.time || Date.now()
@@ -356,13 +364,13 @@ export const AuctionsPage = () => {
     };
   }, []);
 
-  // Update subscriptions when activeAuctions change
+  // Sync subscriptions for new auctions without reconnecting
   useEffect(() => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
-      activeAuctions.forEach(a => {
-        if (!subscribedCoins.current.has(a.token)) {
-          wsRef.current?.send(JSON.stringify({ method: 'subscribe', subscription: { type: 'trades', coin: a.token } }));
-          subscribedCoins.current.add(a.token);
+      auctionCoinsRef.current.forEach(coin => {
+        if (!subscribedCoins.current.has(coin)) {
+          wsRef.current?.send(JSON.stringify({ method: 'subscribe', subscription: { type: 'trades', coin } }));
+          subscribedCoins.current.add(coin);
         }
       });
     }
@@ -441,7 +449,7 @@ export const AuctionsPage = () => {
                {t}
              </button>
           ))}
-          {hip3Error && (
+          { (hip3Error || (hip3Auctions && hip3Auctions.__fetchError)) && (
             <div className="px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider border border-brand-red/30 bg-brand-red/10 text-brand-red flex items-center gap-2">
               <AlertCircle className="w-3 h-3" />
               HIP-3 Data Unavailable
@@ -638,12 +646,12 @@ export const AuctionsPage = () => {
                 
                 <div className="flex justify-between items-end">
                    <div>
-                     <div className="text-[10px] font-bold text-dark-600 uppercase tracking-widest mb-0.5">Trader ID</div>
+                     <div className="text-[10px] font-bold text-dark-600 uppercase tracking-widest mb-0.5">Trader</div>
                      <div className="font-mono text-[11px] text-white/80">{bid.bidder}</div>
                    </div>
                    <div className="text-right flex flex-col items-end">
-                     <span className="font-mono text-dark-300 text-xs">{parseFloat(bid.amount as string).toLocaleString()} size</span>
-                     <span className="font-mono text-brand-neon font-black text-[10px]">at {parseFloat(bid.price as string).toLocaleString()} px</span>
+                     <span className="font-mono text-dark-300 text-xs">size {parseFloat(bid.amount as string).toLocaleString()}</span>
+                     <span className="font-mono text-brand-neon font-black text-[10px]">at {parseFloat(bid.price as string).toLocaleString()}</span>
                    </div>
                 </div>
               </motion.a>

@@ -174,12 +174,18 @@ export const fetchPerpDeployAuctions = async (): Promise<any> => {
 };
 
 export const fetchHip3Auctions = async (): Promise<any> => {
-  const response = await fetch(HYPERLIQUID_API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'hip3DeployAuctionStatus' }),
-  });
-  return response.json();
+  try {
+    const response = await fetch(HYPERLIQUID_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'hip3DeployAuctionStatus' }),
+    });
+    const data = await response.json();
+    if (!data || data.error) throw new Error('HIP-3 endpoint error');
+    return data;
+  } catch (e) {
+    return { __fetchError: true };
+  }
 };
 
 export const fetchLeaderboard = async (): Promise<any> => {

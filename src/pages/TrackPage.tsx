@@ -48,8 +48,7 @@ function startRadarFeed() {
 
             const usdValue = parseFloat(trade.px) * parseFloat(trade.sz);
             if (usdValue >= WHALE_THRESHOLD) {
-              // HL WS trades have users[0] as the active address
-              const walletAddress = trade.users ? trade.users[0] : trade.hash; 
+              const walletAddress = trade.user || (trade.users && trade.users[0]) || trade.hash; 
               
               useStore.getState().addWhaleTrade({
                 id: `${trade.hash}-${trade.time}`,
@@ -58,8 +57,8 @@ function startRadarFeed() {
                 px: trade.px,
                 sz: trade.sz,
                 time: trade.time,
-                hash: trade.hash, // Actual transaction hash
-                address: walletAddress,
+                hash: trade.hash,
+                user: walletAddress,
                 usdValue: usdValue,
                 isSmartMoney: SMART_MONEY_WALLETS.includes(walletAddress.toLowerCase())
               });
@@ -203,7 +202,7 @@ export const TrackPage: React.FC = () => {
                           className="p-1.5 bg-dark-800 hover:bg-brand-neon hover:text-dark-1000 rounded transition-all"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleSetAlert(trade.address);
+                            handleSetAlert(trade.user);
                           }}
                         >
                           <Bell className="w-3 h-3" />
