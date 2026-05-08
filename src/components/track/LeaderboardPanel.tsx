@@ -14,7 +14,7 @@ export const LeaderboardPanel: React.FC = () => {
     // Generate a leaderboard from the live whale feed
     const generateRadarLeaderboard = async () => {
       // 1. Get unique addresses from recent whale trades
-      const addresses = Array.from(new Set(whaleTrades.map(t => t.address))).slice(0, 5);
+      const addresses = Array.from(new Set(whaleTrades.map(t => t.user))).slice(0, 5);
       
       if (addresses.length === 0) return;
 
@@ -33,7 +33,7 @@ export const LeaderboardPanel: React.FC = () => {
               ethAddress: addr,
               accountValue: accountValue,
               pnl: realPnl.toString(),
-              activeTrades: whaleTrades.filter(t => t.address === addr).length
+              activeTrades: whaleTrades.filter(t => t.user === addr).length
             };
           } catch (e) {
             return null;
