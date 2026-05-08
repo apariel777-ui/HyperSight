@@ -30,7 +30,6 @@ const STOCK_LOGOS: Record<string, string> = {
 const CRYPTO_LOGO_SOURCES = [
   (s: string) => `https://bin.bnbstatic.com/static/assets/logos/${s}.png`,
   (s: string) => `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${s.toLowerCase()}.png`,
-  () => `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png`, // Generic trustwallet
 ];
 
 export const AssetLogo: React.FC<AssetLogoProps> = ({ symbol, className, size = 'md' }) => {
@@ -72,7 +71,7 @@ export const AssetLogo: React.FC<AssetLogoProps> = ({ symbol, className, size = 
   if (error) {
     return (
       <div className={clsx(
-        "flex-shrink-0 rounded-full bg-dark-800 border border-dark-700 flex items-center justify-center font-black text-white uppercase tracking-tighter transition-all shadow-[0_0_15px_rgba(255,255,255,0.05)]",
+        "flex-shrink-0 rounded-full bg-brand-neon/10 border border-brand-neon/20 flex items-center justify-center font-black text-brand-neon uppercase tracking-tighter transition-all shadow-[0_0_15px_rgba(0,255,163,0.1)]",
         sizeClasses[size],
         className
       )}>

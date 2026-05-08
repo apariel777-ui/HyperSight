@@ -151,38 +151,45 @@ export const TokenPage: React.FC = () => {
           </div>
           
           <div className="h-[280px] shrink-0 flex">
-            {/* ORDER WALL PREVIEW */}
-            <div className="flex-1 border-r border-dark-900 flex flex-col">
+            {/* RECENT TAPE PREVIEW */}
+            <div className="flex-1 border-r border-dark-900 flex flex-col overflow-hidden">
               <div className="p-3 border-b border-dark-900 bg-dark-950/50 flex justify-between items-center">
                 <div className="text-[10px] font-black text-white uppercase tracking-widest flex items-center gap-2">
-                  <BarChart2 className="w-3.5 h-3.5 text-blue-400" /> Order Walls
+                  <History className="w-3.5 h-3.5 text-brand-neon" /> Recent Tape
                 </div>
-                <Link to="/walls" className="text-[9px] font-black text-brand-neon hover:underline uppercase tracking-widest">Full View</Link>
               </div>
-              <div className="flex-1 overflow-auto p-4 flex flex-col justify-center items-center">
-                {tokenWall ? (
-                   <div className="w-full space-y-4">
-                      <div className="flex justify-between items-end gap-1 h-20">
-                         {/* Simple visual representation of walls */}
-                         {[...Array(20)].map((_, i) => (
-                           <div 
-                             key={i} 
-                             className={clsx("flex-1 rounded-t-sm", i < 10 ? "bg-red-500/20" : "bg-brand-neon/20")}
-                             style={{ height: `${20 + Math.random() * 80}%` }}
-                           />
-                         ))}
-                      </div>
-                      <div className="flex justify-between text-[10px] font-black">
-                        <span className="text-red-500">${(tokenWall.totalAskUsd / 1000).toFixed(0)}K SELL</span>
-                        <span className="text-brand-neon">${(tokenWall.totalBidUsd / 1000).toFixed(0)}K BUY</span>
-                      </div>
-                   </div>
-                ) : (
-                  <div className="text-center opacity-30 flex flex-col items-center">
-                    <Activity className="w-6 h-6 mb-2 animate-pulse" />
-                    <span className="text-[9px] font-black uppercase tracking-widest">Syncing Depth...</span>
-                  </div>
-                )}
+              <div className="flex-1 overflow-auto custom-scrollbar">
+                <table className="w-full text-left border-collapse">
+                  <thead className="sticky top-0 bg-dark-950/95 border-b border-dark-900 z-10">
+                    <tr>
+                      <th className="p-3 text-[9px] font-black uppercase text-dark-500">Price</th>
+                      <th className="p-3 text-[9px] font-black uppercase text-dark-500 text-right">Size</th>
+                      <th className="p-3 text-[9px] font-black uppercase text-dark-500 text-right">Time</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-dark-900/30">
+                    <AnimatePresence initial={false}>
+                      {recentTrades.map((t, i) => (
+                        <motion.tr 
+                          key={`${t.time}-${i}`}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="hover:bg-dark-900/20"
+                        >
+                          <td className={clsx("p-3 font-mono text-[11px] font-black", t.side === 'B' ? "text-brand-neon" : "text-red-500")}>
+                            {parseFloat(t.px).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          </td>
+                          <td className="p-3 text-right font-mono text-[11px] text-white">
+                            {parseFloat(t.sz).toLocaleString()}
+                          </td>
+                          <td className="p-3 text-right font-mono text-[10px] text-dark-500 uppercase">
+                            {new Date(t.time).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                          </td>
+                        </motion.tr>
+                      ))}
+                    </AnimatePresence>
+                  </tbody>
+                </table>
               </div>
             </div>
 
@@ -218,44 +225,45 @@ export const TokenPage: React.FC = () => {
         {/* RIGHT PANEL: LIVE TRADES & WHALES */}
         <div className="w-[400px] shrink-0 flex flex-col overflow-hidden bg-dark-1000/30">
           
-          {/* RECENT TRADES */}
+          {/* ORDER WALLS */}
           <div className="flex-1 flex flex-col border-b border-dark-900 overflow-hidden">
-            <div className="p-3 border-b border-dark-900 bg-dark-950/50 flex items-center gap-2">
-              <History className="w-3.5 h-3.5 text-brand-neon" />
-              <div className="text-[10px] font-black text-white uppercase tracking-widest">Recent Tape</div>
+            <div className="p-3 border-b border-dark-900 bg-dark-950/50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <BarChart2 className="w-3.5 h-3.5 text-blue-400" />
+                <div className="text-[10px] font-black text-white uppercase tracking-widest">Order Depth</div>
+              </div>
+              <Link to="/walls" className="text-[9px] font-black text-brand-neon hover:underline uppercase tracking-widest">Full View</Link>
             </div>
-            <div className="flex-1 overflow-auto custom-scrollbar">
-              <table className="w-full text-left border-collapse">
-                <thead className="sticky top-0 bg-dark-950/95 border-b border-dark-900 z-10">
-                  <tr>
-                    <th className="p-3 text-[9px] font-black uppercase text-dark-500">Price</th>
-                    <th className="p-3 text-[9px] font-black uppercase text-dark-500 text-right">Size</th>
-                    <th className="p-3 text-[9px] font-black uppercase text-dark-500 text-right">Time</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-dark-900/30">
-                  <AnimatePresence initial={false}>
-                    {recentTrades.map((t, i) => (
-                      <motion.tr 
-                        key={`${t.time}-${i}`}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="hover:bg-dark-900/20"
-                      >
-                        <td className={clsx("p-3 font-mono text-[11px] font-black", t.side === 'B' ? "text-brand-neon" : "text-red-500")}>
-                          {parseFloat(t.px).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </td>
-                        <td className="p-3 text-right font-mono text-[11px] text-white">
-                          {parseFloat(t.sz).toLocaleString()}
-                        </td>
-                        <td className="p-3 text-right font-mono text-[10px] text-dark-500 uppercase">
-                          {new Date(t.time).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                        </td>
-                      </motion.tr>
-                    ))}
-                  </AnimatePresence>
-                </tbody>
-              </table>
+            <div className="flex-1 overflow-auto p-4 flex flex-col justify-center items-center bg-dark-1000/20">
+              {tokenWall ? (
+                 <div className="w-full space-y-4">
+                    <div className="flex justify-between items-end gap-1 h-32">
+                       {/* Simple visual representation of walls */}
+                       {[...Array(20)].map((_, i) => (
+                         <div 
+                           key={i} 
+                           className={clsx("flex-1 rounded-t-sm transition-all duration-500", i < 10 ? "bg-red-500/20" : "bg-brand-neon/20")}
+                           style={{ height: `${20 + Math.random() * 80}%` }}
+                         />
+                       ))}
+                    </div>
+                    <div className="flex justify-between text-[10px] font-black px-2">
+                      <div className="flex flex-col">
+                        <span className="text-dark-500 uppercase text-[8px]">Asks</span>
+                        <span className="text-red-500">${(tokenWall.totalAskUsd / 1000).toFixed(0)}K</span>
+                      </div>
+                      <div className="flex flex-col text-right">
+                        <span className="text-dark-500 uppercase text-[8px]">Bids</span>
+                        <span className="text-brand-neon">${(tokenWall.totalBidUsd / 1000).toFixed(0)}K</span>
+                      </div>
+                    </div>
+                 </div>
+              ) : (
+                <div className="text-center opacity-30 flex flex-col items-center">
+                  <Activity className="w-6 h-6 mb-2 animate-pulse" />
+                  <span className="text-[9px] font-black uppercase tracking-widest">Syncing Depth...</span>
+                </div>
+              )}
             </div>
           </div>
 

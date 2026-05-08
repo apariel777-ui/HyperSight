@@ -223,3 +223,12 @@ export const fetchSpotMeta = async (): Promise<any> => {
   });
   return response.json();
 };
+
+export const fetchAllMids = async (): Promise<Record<string, string>> => {
+  const response = await fetch(HYPERLIQUID_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'allMids' }),
+  });
+  return response.json();
+};

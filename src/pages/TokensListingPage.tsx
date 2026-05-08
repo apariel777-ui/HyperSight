@@ -9,7 +9,7 @@ import {
   ExternalLink,
   Coins
 } from 'lucide-react';
-import { fetchMarkets, fetchSpotMeta } from '../api/hyperliquid';
+import { fetchMarkets, fetchSpotMeta, fetchAllMids } from '../api/hyperliquid';
 import { AssetLogo } from '../components/common/AssetLogo';
 import clsx from 'clsx';
 
@@ -28,14 +28,23 @@ export const TokensListingPage: React.FC = () => {
     queryFn: fetchSpotMeta
   });
 
-  const spotTokens = (spot?.tokens || []).map((t: any) => ({
-    name: t.name,
-    markPx: 0, // Spot price requires a different request, using 0 for listing
-    change24h: 0,
-    volume24h: 0,
-    isSpot: true,
-    index: t.index
-  }));
+  const { data: allMids } = useQuery({
+    queryKey: ['allMids'],
+    queryFn: fetchAllMids,
+    refetchInterval: 5000
+  });
+
+  const spotTokens = (spot?.tokens || []).map((t: any) => {
+    const price = allMids ? parseFloat(allMids[t.name] || '0') : 0;
+    return {
+      name: t.name,
+      markPx: price,
+      change24h: 0, // 24h change for spot requires additional stats endpoint if needed
+      volume24h: 0,
+      isSpot: true,
+      index: t.index
+    };
+  });
 
   const allTokens = activeTab === 'Perp' ? (perps || []) : spotTokens;
   const filtered = allTokens.filter((t: any) => 

@@ -179,12 +179,7 @@ export const TrackPage: React.FC = () => {
                       initial={{ opacity: 0 }} 
                       animate={{ opacity: 1 }} 
                       className="hover:bg-dark-900/30 transition-all group cursor-pointer"
-                      onClick={() => useStore.getState().setSelectedWhale({
-                        address: trade.hash,
-                        totalValue: '0',
-                        withdrawable: '0',
-                        positions: []
-                      })}
+                      onClick={() => window.open(`https://hypurrscan.io/tx/${trade.hash}`, '_blank')}
                     >
                       <td className="p-3">
                         <div className="flex flex-col">
