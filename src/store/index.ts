@@ -8,7 +8,8 @@ export interface WhaleTrade {
   px: string;
   sz: string;
   time: number;
-  hash: string;
+  hash: string;    // Transaction hash
+  address: string; // Wallet address
   usdValue: number;
   isSmartMoney?: boolean;
 }
@@ -83,6 +84,8 @@ interface StoreState {
   setSelectedWhale: (data: WhalePortfolio | null) => void;
   wallSnapshots: Record<string, unknown>;
   setWallSnapshot: (coin: string, snap: unknown) => void;
+  wallsConnectionStatus: 'connecting' | 'connected' | 'error';
+  setWallsConnectionStatus: (status: 'connecting' | 'connected' | 'error') => void;
 }
 
 export const useStore = create<StoreState>()(
@@ -118,6 +121,8 @@ export const useStore = create<StoreState>()(
       setWallSnapshot: (coin, snap) => set((state) => ({
         wallSnapshots: { ...state.wallSnapshots, [coin]: snap }
       })),
+      wallsConnectionStatus: 'connecting',
+      setWallsConnectionStatus: (status) => set({ wallsConnectionStatus: status }),
       limitOrders: [],
       setLimitOrders: (orders) => set({ limitOrders: orders }),
       addLimitOrder: (order: LimitOrder) => set((state) => {

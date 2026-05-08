@@ -58,7 +58,8 @@ function startRadarFeed() {
                 px: trade.px,
                 sz: trade.sz,
                 time: trade.time,
-                hash: walletAddress, // correctly use user address instead of tx hash
+                hash: trade.hash, // Actual transaction hash
+                address: walletAddress,
                 usdValue: usdValue,
                 isSmartMoney: SMART_MONEY_WALLETS.includes(walletAddress.toLowerCase())
               });
@@ -202,7 +203,7 @@ export const TrackPage: React.FC = () => {
                           className="p-1.5 bg-dark-800 hover:bg-brand-neon hover:text-dark-1000 rounded transition-all"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleSetAlert(trade.hash);
+                            handleSetAlert(trade.address);
                           }}
                         >
                           <Bell className="w-3 h-3" />

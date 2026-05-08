@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useStore } from '../store';
 import { fetchMarkets } from '../api/hyperliquid';
@@ -9,6 +10,7 @@ import clsx from 'clsx';
 
 export const ChartPage = () => {
   const selectedMarket = useStore((s) => s.selectedMarket);
+  const [selectedInterval, setSelectedInterval] = useState('1h');
 
   const { data: markets } = useQuery({
     queryKey: ['markets'],
@@ -50,7 +52,16 @@ export const ChartPage = () => {
           {/* TOOLBAR: Top Center/Right */}
           <div className="absolute top-4 right-4 z-20 flex items-center gap-2 bg-dark-950/80 border border-dark-800 p-1.5 rounded-lg">
             {['1m', '5m', '15m', '1h', '4h', '1D'].map(tf => (
-              <button key={tf} className="px-2 py-1 text-[10px] font-bold text-dark-400 hover:text-white transition-colors">{tf}</button>
+              <button 
+                key={tf} 
+                onClick={() => setSelectedInterval(tf)}
+                className={clsx(
+                  "px-2 py-1 text-[10px] font-bold transition-colors",
+                  selectedInterval === tf ? "text-brand-neon bg-brand-neon/10 rounded" : "text-dark-400 hover:text-white"
+                )}
+              >
+                {tf}
+              </button>
             ))}
             <div className="w-px h-3 bg-dark-800 mx-1" />
             <Activity size={14} className="text-dark-400 hover:text-brand-neon cursor-pointer" />
@@ -58,7 +69,7 @@ export const ChartPage = () => {
 
           {/* MAIN CHART */}
           <div className="flex-1 min-h-0 bg-dark-1000 overflow-hidden">
-            <TradingChart key={selectedMarket} symbol={selectedMarket} />
+            <TradingChart key={`${selectedMarket}-${selectedInterval}`} symbol={selectedMarket} interval={selectedInterval} />
           </div>
         </div>
       </div>

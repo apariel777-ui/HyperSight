@@ -223,10 +223,18 @@ export const AuctionsPage = () => {
     refetchInterval: 5000 
   });
 
-  const { data: hip3Auctions } = useQuery({
+  const { data: hip3Auctions, error: hip3Error } = useQuery({
     queryKey: ['auctions', 'hip3'],
-    queryFn: fetchHip3Auctions,
-    refetchInterval: 5000 
+    queryFn: async () => {
+      try {
+        return await fetchHip3Auctions();
+      } catch (err) {
+        console.error('HIP-3 Fetch Error:', err);
+        throw err;
+      }
+    },
+    refetchInterval: 5000,
+    retry: 1
   });
 
   // Timer loop for localized sub-second accuracy
@@ -300,20 +308,19 @@ export const AuctionsPage = () => {
 
   // WebSocket — always subscribe to real high-volume perp markets for live feed
   const wsRef = useRef<WebSocket | null>(null);
+  const subscribedCoins = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    let reconnectTimer: ReturnType<typeof setTimeout>;
-
     const connect = () => {
       const ws = new WebSocket(HYPERLIQUID_WS_URL);
       wsRef.current = ws;
 
       ws.onopen = () => {
-        // Subscribe to active auction tokens + guaranteed high-volume perps
-        const auctionCoins = activeAuctions.map(a => a.token);
-        const allCoins = Array.from(new Set([...LIVE_FEED_COINS, ...auctionCoins]));
-        allCoins.forEach(coin => {
+        subscribedCoins.current.clear();
+        // Subscribe to high-volume perps
+        LIVE_FEED_COINS.forEach(coin => {
           ws.send(JSON.stringify({ method: 'subscribe', subscription: { type: 'trades', coin } }));
+          subscribedCoins.current.add(coin);
         });
       };
 
@@ -322,9 +329,7 @@ export const AuctionsPage = () => {
           const data = JSON.parse(event.data);
           if (data.channel === 'trades' && Array.isArray(data.data)) {
             data.data.forEach((t: any) => {
-              // Only show real trades with valid hashes for verification
               if (!t.hash || t.hash.startsWith('0x000000')) return;
-
               const newBid: BidEvent = {
                 id: t.hash,
                 token: t.coin || 'Unknown',
@@ -340,19 +345,27 @@ export const AuctionsPage = () => {
       };
 
       ws.onclose = () => {
-        // Auto-reconnect after 3s if closed unexpectedly
-        reconnectTimer = setTimeout(connect, 3000);
+        setTimeout(connect, 3000);
       };
-
       ws.onerror = () => ws.close();
     };
 
     connect();
-
     return () => {
-      clearTimeout(reconnectTimer);
       if (wsRef.current) wsRef.current.close();
     };
+  }, []);
+
+  // Update subscriptions when activeAuctions change
+  useEffect(() => {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      activeAuctions.forEach(a => {
+        if (!subscribedCoins.current.has(a.token)) {
+          wsRef.current?.send(JSON.stringify({ method: 'subscribe', subscription: { type: 'trades', coin: a.token } }));
+          subscribedCoins.current.add(a.token);
+        }
+      });
+    }
   }, [activeAuctions]);
 
   const liveFiltered = activeAuctions.filter(a => filterType === 'All' || a.type === filterType);
@@ -427,7 +440,13 @@ export const AuctionsPage = () => {
              >
                {t}
              </button>
-           ))}
+          ))}
+          {hip3Error && (
+            <div className="px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-wider border border-brand-red/30 bg-brand-red/10 text-brand-red flex items-center gap-2">
+              <AlertCircle className="w-3 h-3" />
+              HIP-3 Data Unavailable
+            </div>
+          )}
         </div>
 
         {/* LIVE AUCTIONS TAB */}
@@ -581,10 +600,13 @@ export const AuctionsPage = () => {
       {/* RIGHT SIDEBAR: REAL-TIME BID FEED */}
       <div className="w-[350px] shrink-0 bg-dark-950 border-l border-dark-900 flex flex-col relative z-20">
         <div className="p-5 border-b border-dark-900 flex items-center justify-between bg-dark-1000">
-          <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-2">
-            <Activity className="w-4 h-4 text-brand-neon" /> 
-            Live Feed Explorer
-          </h3>
+          <div className="flex flex-col">
+            <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-2">
+              <Activity className="w-4 h-4 text-brand-neon" /> 
+              Live Network Explorer
+            </h3>
+            <span className="text-[8px] text-dark-500 font-bold uppercase tracking-widest mt-0.5">Real-time trade activity feed</span>
+          </div>
           <div className="px-2 py-1 bg-brand-neon/10 text-brand-neon text-[9px] font-bold rounded flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 bg-brand-neon rounded-full animate-ping" />
             WSS DATA FEED
@@ -616,7 +638,7 @@ export const AuctionsPage = () => {
                 
                 <div className="flex justify-between items-end">
                    <div>
-                     <div className="text-[10px] font-bold text-dark-600 uppercase tracking-widest mb-0.5">Bidder Signature</div>
+                     <div className="text-[10px] font-bold text-dark-600 uppercase tracking-widest mb-0.5">Trader ID</div>
                      <div className="font-mono text-[11px] text-white/80">{bid.bidder}</div>
                    </div>
                    <div className="text-right flex flex-col items-end">

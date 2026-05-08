@@ -14,7 +14,7 @@ export const LeaderboardPanel: React.FC = () => {
     // Generate a leaderboard from the live whale feed
     const generateRadarLeaderboard = async () => {
       // 1. Get unique addresses from recent whale trades
-      const addresses = Array.from(new Set(whaleTrades.map(t => t.hash))).slice(0, 5);
+      const addresses = Array.from(new Set(whaleTrades.map(t => t.address))).slice(0, 5);
       
       if (addresses.length === 0) return;
 
@@ -25,11 +25,13 @@ export const LeaderboardPanel: React.FC = () => {
           try {
             const state = await fetchWhaleState(addr);
             const accountValue = state?.marginSummary?.accountValue || '0';
+            const pnl = state?.marginSummary?.unrealizedPnl || '0';
+            
             return {
               ethAddress: addr,
               accountValue: accountValue,
-              pnl: (parseFloat(accountValue) * 0.15).toString(), // Estimate PnL if not available
-              activeTrades: whaleTrades.filter(t => t.hash === addr).length
+              pnl: pnl,
+              activeTrades: whaleTrades.filter(t => t.address === addr).length
             };
           } catch (e) {
             return null;
@@ -111,17 +113,23 @@ export const LeaderboardPanel: React.FC = () => {
                     </a>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-2.5 rounded-xl bg-dark-1000 border border-dark-900 group-hover:border-dark-800 transition-all">
-                      <div className="text-[8px] font-black text-dark-500 uppercase mb-1 tracking-widest">Real Balance</div>
-                      <div className="text-[12px] font-black text-white tracking-tighter">
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="p-2 rounded-lg bg-dark-1000 border border-dark-900 group-hover:border-dark-800 transition-all">
+                      <div className="text-[7px] font-black text-dark-500 uppercase mb-1 tracking-widest">Balance</div>
+                      <div className="text-[10px] font-black text-white tracking-tighter">
                         ${Math.round(parseFloat(entry.accountValue)).toLocaleString()}
                       </div>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-dark-1000 border border-dark-900 group-hover:border-dark-800 transition-all">
-                      <div className="text-[8px] font-black text-dark-500 uppercase mb-1 tracking-widest">Radar Hits</div>
-                      <div className="text-[12px] font-black text-brand-neon">
-                        {entry.activeTrades} Large Orders
+                    <div className="p-2 rounded-lg bg-dark-1000 border border-dark-900 group-hover:border-dark-800 transition-all">
+                      <div className="text-[7px] font-black text-dark-500 uppercase mb-1 tracking-widest">Open PnL</div>
+                      <div className={clsx("text-[10px] font-black tracking-tighter", parseFloat(entry.pnl) >= 0 ? "text-brand-neon" : "text-brand-red")}>
+                        {parseFloat(entry.pnl) >= 0 ? '+' : ''}${Math.round(parseFloat(entry.pnl)).toLocaleString()}
+                      </div>
+                    </div>
+                    <div className="p-2 rounded-lg bg-dark-1000 border border-dark-900 group-hover:border-dark-800 transition-all">
+                      <div className="text-[7px] font-black text-dark-500 uppercase mb-1 tracking-widest">Radar Hits</div>
+                      <div className="text-[10px] font-black text-blue-400">
+                        {entry.activeTrades} Hits
                       </div>
                     </div>
                   </div>

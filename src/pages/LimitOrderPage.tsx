@@ -63,35 +63,59 @@ function buildSnapshot(book: RawBook): DepthSnapshot {
 }
 
 function startFeed() {
+  const store = useStore.getState();
 
-  // 1-second batch flush — writes buffered books into the store
+  // 1-second batch flush
   if (!_timer) {
     _timer = setInterval(() => {
       _books.forEach((book, coin) => {
-        useStore.getState().setWallSnapshot(coin, buildSnapshot(book));
+        store.setWallSnapshot(coin, buildSnapshot(book));
       });
     }, UPDATE_MS);
   }
 
-  // WebSocket — write raw books to buffer only, zero React state writes
   if (_ws && _ws.readyState !== WebSocket.CLOSED) return;
 
   const connect = () => {
     _ws = new WebSocket(HL_WS_URL);
+    
+    const timeout = setTimeout(() => {
+      if (store.wallsConnectionStatus === 'connecting') {
+        store.setWallsConnectionStatus('error');
+      }
+    }, 10000);
+
     _ws.onopen = () => {
       RADAR_COINS.forEach(coin =>
         _ws?.send(JSON.stringify({ method: 'subscribe', subscription: { type: 'l2Book', coin } }))
       );
     };
+
     _ws.onmessage = (e) => {
       try {
         const msg = JSON.parse(e.data);
-        if (msg.channel === 'l2Book' && msg.data?.levels) _books.set(msg.data.coin, msg.data);
+        if (msg.channel === 'l2Book' && msg.data?.levels) {
+          if (store.wallsConnectionStatus !== 'connected') {
+            store.setWallsConnectionStatus('connected');
+            clearTimeout(timeout);
+          }
+          _books.set(msg.data.coin, msg.data);
+        }
       } catch (_) { /* ignore */ }
     };
-    _ws.onclose = () => setTimeout(connect, 3000);
-    _ws.onerror  = () => _ws?.close();
+
+    _ws.onclose = () => {
+      clearTimeout(timeout);
+      setTimeout(connect, 3000);
+    };
+
+    _ws.onerror = () => {
+      clearTimeout(timeout);
+      store.setWallsConnectionStatus('error');
+      _ws?.close();
+    };
   };
+
   connect();
 }
 // ─────────────────────────────────────────────────────────────────────────────
@@ -150,12 +174,11 @@ const PressureGauge: React.FC<{ buyUsd: number; sellUsd: number }> = ({ buyUsd, 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export const LimitOrderPage: React.FC = () => {
   const [activeCoin, setActiveCoin] = useState('BTC');
+  const status = useStore(s => s.wallsConnectionStatus);
   const wallSnapshots = useStore(s => s.wallSnapshots) as Record<string, DepthSnapshot>;
 
-  // Start feed once — keeps running even when user navigates away
   useEffect(() => {
     startFeed();
-    // no cleanup — intentional, feed stays alive
   }, []);
 
   const snap      = wallSnapshots[activeCoin] as DepthSnapshot | undefined;
@@ -167,8 +190,27 @@ export const LimitOrderPage: React.FC = () => {
   const totalBuy  = allSnaps.reduce((s, v) => s + v.totalBidUsd, 0);
   const totalSell = allSnaps.reduce((s, v) => s + v.totalAskUsd, 0);
 
+  if (status === 'error' && !snap) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-20 text-center">
+        <Activity className="w-12 h-12 text-brand-red mb-4" />
+        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Connection Failed</h2>
+        <p className="text-dark-400 mt-2 max-w-md">
+          Unable to establish a real-time WebSocket connection to the Hyperliquid L1. 
+          Please check your network or firewall settings.
+        </p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="mt-8 px-8 py-3 bg-dark-900 text-white rounded-lg font-black uppercase tracking-widest border border-dark-800 hover:bg-dark-800"
+        >
+          Retry Connection
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col bg-dark-1000 p-4 gap-4 overflow-y-auto">
+    <div className="flex flex-col bg-dark-1000 p-4 gap-4 overflow-y-auto h-full">
 
       {/* HEADER */}
       <div className="flex items-center justify-between">

@@ -1,12 +1,29 @@
 import { MarketsTable } from '../components/markets/MarketsTable';
+import { useStore } from '../store';
+import { AlertCircle } from 'lucide-react';
+import clsx from 'clsx';
 
 export const MarketsPage = () => {
+  const selectedCategory = useStore((s) => s.selectedCategory);
+  
   return (
     <div className="pt-8 px-6 max-w-[1600px] mx-auto pb-12">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-dark-400">Markets Overview</h1>
-          <p className="text-dark-400 mt-2">Trade perpetual futures with deep liquidity and zero gas fees.</p>
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-dark-400">Markets Overview</h1>
+            {selectedCategory !== 'Crypto' && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 text-[10px] font-black uppercase tracking-widest rounded-full animate-pulse shadow-[0_0_15px_rgba(234,179,8,0.15)]">
+                <AlertCircle className="w-3.5 h-3.5" />
+                Simulated Data
+              </div>
+            )}
+          </div>
+          <p className="text-dark-400 mt-2">
+            {selectedCategory === 'Crypto' 
+              ? "Trade perpetual futures with deep liquidity and zero gas fees on the L1."
+              : `Explore ${selectedCategory} markets with real-time price action and high-frequency data feed.`}
+          </p>
         </div>
         <div className="flex gap-4">
           <div className="p-4 glass-panel flex flex-col items-end">

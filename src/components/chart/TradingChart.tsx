@@ -12,11 +12,12 @@ import { useStore } from '../../store';
 
 interface TradingChartProps {
   symbol: string;
+  interval?: string;
 }
 
 const TIMEFRAMES = ['1m', '5m', '15m', '1h', '4h', '1d'];
 
-export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
+export const TradingChart: React.FC<TradingChartProps> = ({ symbol, interval = '1h' }) => {
   const activeTool = useStore((s) => s.activeDrawingTool);
   const setActiveTool = useStore((s) => s.setActiveDrawingTool);
   const drawingBuffer = useStore((s) => s.drawingBuffer);
@@ -26,8 +27,12 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
   const chartRef = useRef<any>(null);
   const candleSeriesRef = useRef<any>(null);
   const volumeSeriesRef = useRef<any>(null);
-  const [timeframe, setTimeframe] = useState('1h');
+  const [timeframe, setTimeframe] = useState(interval);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeframe(interval);
+  }, [interval]);
 
   const userDrawings = useRef<any[]>([]);
   const liquidationLines = useRef<any[]>([]);
@@ -238,22 +243,6 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div className="flex items-center gap-1 px-4 py-2 border-b border-dark-900 bg-dark-1000 overflow-x-auto no-scrollbar">
-        <span className="text-[10px] text-dark-500 mr-3 font-black uppercase tracking-tighter whitespace-nowrap">Interval</span>
-        {TIMEFRAMES.map((tf) => (
-          <button
-            key={tf}
-            onClick={() => setTimeframe(tf)}
-            className={`px-3 py-1 rounded text-[10px] font-bold uppercase transition-all ${
-              timeframe === tf ? 'bg-brand-neon/10 text-brand-neon border border-brand-neon/20 shadow-[0_0_10px_rgba(0,255,163,0.1)]' : 'text-dark-400 hover:text-white hover:bg-dark-800'
-            }`}
-          >
-            {tf}
-          </button>
-        ))}
-        {loading && <span className="ml-auto flex items-center gap-1.5 text-[10px] text-dark-500 font-bold uppercase tracking-widest px-2"><span className="w-1.5 h-1.5 rounded-full bg-brand-neon inline-block animate-ping" />LIVE</span>}
-      </div>
-
       <div ref={wrapperRef} style={{ flex: 1, minHeight: 0, position: 'relative' }}>
         <div ref={chartContainerRef} style={{ position: 'absolute', inset: 0 }} />
         {drawingBuffer && <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-brand-neon text-dark-1000 text-[10px] font-bold px-3 py-1.5 rounded-full shadow-lg z-50 animate-bounce">CLICK SECOND POINT TO COMPLETE TRENDLINE</div>}
